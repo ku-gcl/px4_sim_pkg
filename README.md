@@ -27,7 +27,7 @@ catkin_make
 
 ```
 roslaunch apm.launch fcu_url:=/dev/ttyS0:921600 gcs_url:=udp://:14550@192.168.xxx.xxx:14557
-rosrun px4_sim_pkg guided_sample
+rosrun px4_sim_pkg ardu_guided
 ```
 
 
