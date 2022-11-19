@@ -21,6 +21,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "offb_node");
     ros::NodeHandle nh;
 
+    // state_cb is a call back function
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             ("mavros/state", 10, state_cb);
     ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>
@@ -40,6 +41,11 @@ int main(int argc, char **argv)
         ros::spinOnce();
         rate.sleep();
     }
+
+    // set global position origin
+    ROS_INFO("set GP origin");
+    geographic_msgs::GeoPointStamped geo;
+    set_gp_origin_pub.publish(geo);
 
     geometry_msgs::PoseStamped pose;
     pose.pose.position.x = 0;
@@ -69,7 +75,7 @@ int main(int argc, char **argv)
             (ros::Time::now() - last_request > ros::Duration(5.0))){
             if( set_mode_client.call(offb_set_mode) &&
                 offb_set_mode.response.mode_sent){
-                ROS_INFO("Offboard enabled");
+                ROS_INFO("Guided enabled");
             }
             last_request = ros::Time::now();
         } else {
