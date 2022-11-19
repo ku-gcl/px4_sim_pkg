@@ -30,7 +30,7 @@ int main(int argc, char **argv)
             ("mavros/cmd/arming");
     ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>
             ("mavros/set_mode");
-    ros::Publisher set_gp_origin_pub = nh.advertise<geometry_msgs::GeoPointStamped>
+    ros::Publisher set_gp_origin_pub = nh.advertise<geographic_msgs::GeoPointStamped>
             ("mavros/global_position/set_gp_origin", 10);
 
     //the setpoint publishing rate MUST be faster than 2Hz
