@@ -6,6 +6,7 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geographic_msgs/GeoPointStamped.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
@@ -28,6 +29,8 @@ int main(int argc, char **argv)
             ("mavros/cmd/arming");
     ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>
             ("mavros/set_mode");
+    ros::Publisher set_gp_origin_pub = nh.advertise<geometry_msgs::GeoPointStamped>
+            ("mavros/global_position/set_gp_origin", 10);
 
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
@@ -62,18 +65,14 @@ int main(int argc, char **argv)
     ros::Time last_request = ros::Time::now();
 
     while(ros::ok()){
-        // if( current_state.mode != "OFFBOARD" &&
-        if (current_state.mode != "GUIDED" &&
-            (ros::Time::now() - last_request > ros::Duration(5.0)))
-        {
+        if( current_state.mode != "GUIDED" &&
+            (ros::Time::now() - last_request > ros::Duration(5.0))){
             if( set_mode_client.call(offb_set_mode) &&
                 offb_set_mode.response.mode_sent){
                 ROS_INFO("Offboard enabled");
             }
             last_request = ros::Time::now();
-        }
-        else
-        {
+        } else {
             if( !current_state.armed &&
                 (ros::Time::now() - last_request > ros::Duration(5.0))){
                 if( arming_client.call(arm_cmd) &&
