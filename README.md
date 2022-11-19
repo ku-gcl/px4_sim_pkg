@@ -12,8 +12,8 @@ catkin_make
 px4_sim_pkg/CMakeLists.txtの最下行に以下を追加する．
 
 ```
-add_executable(offboard_sample src/ardu_guided.cpp)
-target_link_libraries(guided_sample ${catkin_LIBRARIES})
+add_executable(ardu_guided src/ardu_guided.cpp)
+target_link_libraries(ardu_guided ${catkin_LIBRARIES})
 ```
 
 ## ビルド
