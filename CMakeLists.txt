@@ -204,5 +204,8 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-add_executable(offboard_sample src/offboard_sample.cpp)
-target_link_libraries(offboard_sample ${catkin_LIBRARIES})
+
+# add_executable(offboard_sample src/offboard_sample.cpp)
+# target_link_libraries(offboard_sample ${catkin_LIBRARIES})
+add_executable(offboard_sample src/ardu_guided.cpp)
+target_link_libraries(guided_sample ${catkin_LIBRARIES})
