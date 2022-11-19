@@ -207,5 +207,5 @@ include_directories(
 
 # add_executable(offboard_sample src/offboard_sample.cpp)
 # target_link_libraries(offboard_sample ${catkin_LIBRARIES})
-add_executable(offboard_sample src/ardu_guided.cpp)
-target_link_libraries(guided_sample ${catkin_LIBRARIES})
+add_executable(ardu_guided src/ardu_guided.cpp)
+target_link_libraries(ardu_guided ${catkin_LIBRARIES})
