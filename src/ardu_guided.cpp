@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     // for PX4
     // offb_set_mode.request.custom_mode = "OFFBOARD";
     // for Ardupilot
-    offb_set_mode.request.custom_mode = "GUIDED";
+    offb_set_mode.request.custom_mode = "ALTHOLD";
 
     mavros_msgs::CommandBool arm_cmd;
     arm_cmd.request.value = true;
@@ -73,11 +73,11 @@ int main(int argc, char **argv)
     ros::Time last_request = ros::Time::now();
 
     while(ros::ok()){
-        if( current_state.mode != "GUIDED" &&
+        if( current_state.mode != "ALTHOLD" &&
             (ros::Time::now() - last_request > ros::Duration(5.0))){
             if( set_mode_client.call(offb_set_mode) &&
                 offb_set_mode.response.mode_sent){
-                ROS_INFO("Guided enabled");
+                ROS_INFO("ALTHOLD enabled");
             }
             last_request = ros::Time::now();
         } else {
