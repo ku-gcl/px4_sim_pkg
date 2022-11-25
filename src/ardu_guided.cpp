@@ -44,8 +44,8 @@ int main(int argc, char **argv)
     // set global position origin
     ROS_INFO("set GP origin");
     geographic_msgs::GeoPointStamped geo;
-    geo.latitude = 33.595270;
-    geo.longitude = 130.215496;
+    geo.position.latitude = 33.595270;
+    geo.position.longitude = 130.215496;
     set_gp_origin_pub.publish(geo);
 
     geometry_msgs::PoseStamped pose;
