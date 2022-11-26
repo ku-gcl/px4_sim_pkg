@@ -147,9 +147,10 @@ int main(int argc, char **argv)
     set_gp_origin_pub.publish(geo);
 
     // geometry_msgs::PoseStamped pose;
-    pose.pose.position.x = 0;
-    pose.pose.position.y = 0;
-    pose.pose.position.z = 1.5;
+    // pose.pose.position.x = 0;
+    // pose.pose.position.y = 0;
+    // pose.pose.position.z = 1.5;
+    setDestination(0, 0, 1.5);
     // send a few setpoints before starting
     ROS_INFO("send a few setpoints");
     for (int i = 100; ros::ok() && i > 0; --i)
@@ -203,7 +204,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    sleep(10);
+    sleep(5);
 
     // move foreward
     setHeading(0);
@@ -211,9 +212,9 @@ int main(int argc, char **argv)
     float tollorance = .35;
     local_pos_pub.publish(pose);
 
-    sleep(10);
+    sleep(5);
     ros::Time last_request = ros::Time::now();
-
+    ROS_INFO("moving start");
     if (local_pos_pub)
     {
         for (int i = 10000; ros::ok() && i > 0; --i)
