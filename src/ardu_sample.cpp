@@ -2,21 +2,21 @@
 // https://github.com/Texas-Aerial-Robotics/Controls-ROS/blob/master/src/staple.cpp
 
 #include <iostream>
-#include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <ros/ros.h>                   //
+#include <geometry_msgs/PoseStamped.h> //
 #include <nav_msgs/Odometry.h>
 #include "std_msgs/Float64.h"
-#include <mavros_msgs/CommandBool.h>
-#include <mavros_msgs/SetMode.h>
-#include <mavros_msgs/State.h>
+#include <mavros_msgs/CommandBool.h> //
+#include <mavros_msgs/SetMode.h>     //
+#include <mavros_msgs/State.h>       //
 #include <mavros_msgs/PositionTarget.h>
 #include <unistd.h>
 #include <geometry_msgs/Pose2D.h>
-#include <mavros_msgs/CommandTOL.h>
+#include <mavros_msgs/CommandTOL.h> //
 #include <time.h>
-#include <cmath>
-#include <math.h>
-#include <ros/duration.h>
+#include <cmath>          //
+#include <math.h>         //
+#include <ros/duration.h> //
 
 using namespace std;
 
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>("mavros/state", 10, state_cb);
     ros::Publisher set_vel_pub = nh.advertise<mavros_msgs::PositionTarget>("mavros/setpoint_raw/local", 10);
     ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>("mavros/setpoint_position/local", 10);
-    ros::Subscriber currentPos = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/global_position/pose", 10, pose_cb);
+    ros::Subscriber currentPos = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/global_position/pose", 10, );
     ros::Subscriber currentHeading = nh.subscribe<std_msgs::Float64>("/mavros/global_position/compass_hdg", 10, heading_cb);
 
     // allow the subscribers to initialize
