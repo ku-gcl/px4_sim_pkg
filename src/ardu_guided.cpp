@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 
     // move foreward
     setHeading(0);
-    setDestination(0, 1, 1.5);
+    setDestination(0, 0, 1.5);
     float tollorance = .35;
 
     if (local_pos_pub)
