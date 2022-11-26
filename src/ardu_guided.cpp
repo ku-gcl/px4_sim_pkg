@@ -117,21 +117,9 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
-    // set global position origin
-    ROS_INFO("set GP origin");
-    geographic_msgs::GeoPointStamped geo;
-    geo.position.latitude = 33.595270;
-    geo.position.longitude = 130.215496;
-    set_gp_origin_pub.publish(geo);
-
     // allow the subscribers to initialize
     ROS_INFO("INITILIZING...");
     for (int i = 0; i < 100; i++)
-    {
-        ros::spinOnce();
-        ros::Duration(0.01).sleep();
-    }
-    while (current_state.mode != "GUIDED")
     {
         ros::spinOnce();
         ros::Duration(0.01).sleep();
@@ -150,6 +138,13 @@ int main(int argc, char **argv)
     ROS_INFO("the N' axis is facing: %f", GYM_OFFSET);
     cout << GYM_OFFSET << "\n"
          << endl;
+
+    // set global position origin
+    ROS_INFO("set GP origin");
+    geographic_msgs::GeoPointStamped geo;
+    geo.position.latitude = 33.595270;
+    geo.position.longitude = 130.215496;
+    set_gp_origin_pub.publish(geo);
 
     // geometry_msgs::PoseStamped pose;
     pose.pose.position.x = 0;
@@ -174,6 +169,13 @@ int main(int argc, char **argv)
     // {
     //     ROS_INFO("GUIDED enabled");
     // }
+
+    ROS_INFO("Change to GUIDED Mode");
+    while (current_state.mode != "GUIDED")
+    {
+        ros::spinOnce();
+        ros::Duration(0.01).sleep();
+    }
 
     // arming
     mavros_msgs::CommandBool arm_cmd;

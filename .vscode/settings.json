@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.html": "html",
+        "*.dcm": "vba",
+        "*.m": "matlab",
+        "*.cpp": "cpp",
+        "__node_handle": "cpp"
+    }
+}
