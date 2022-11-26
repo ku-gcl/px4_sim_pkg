@@ -207,30 +207,37 @@ int main(int argc, char **argv)
 
     // move foreward
     setHeading(0);
-    setDestination(0, 0, 1.5);
+    setDestination(1.0, 0, 1.0);
     float tollorance = .35;
+    local_pos_pub.publish(pose);
+
+    sleep(10);
+    ros::Time last_request = ros::Time::now();
 
     if (local_pos_pub)
     {
         for (int i = 10000; ros::ok() && i > 0; --i)
         {
+            ros::Time now = ros::Time::now();
+            setDestination(cos(0.1 * (now - last_request)), sin(0.1 * (now - last_request)), 1.5);
             local_pos_pub.publish(pose);
-            float deltaX = abs(pose.pose.position.x - current_pose.pose.position.x);
-            float deltaY = abs(pose.pose.position.y - current_pose.pose.position.y);
-            float deltaZ = abs(pose.pose.position.z - current_pose.pose.position.z);
-            // cout << " dx " << deltaX << " dy " << deltaY << " dz " << deltaZ << endl;
-            float dMag = sqrt(pow(deltaX, 2) + pow(deltaY, 2) + pow(deltaZ, 2));
-            cout << dMag << endl;
-            if (dMag < tollorance)
-            {
-                break;
-            }
-            ros::spinOnce();
-            ros::Duration(0.5).sleep();
-            if (i == 1)
-            {
-                ROS_INFO("Failed to reach destination. Stepping to next task.");
-            }
+
+            // float deltaX = abs(pose.pose.position.x - current_pose.pose.position.x);
+            // float deltaY = abs(pose.pose.position.y - current_pose.pose.position.y);
+            // float deltaZ = abs(pose.pose.position.z - current_pose.pose.position.z);
+            // // cout << " dx " << deltaX << " dy " << deltaY << " dz " << deltaZ << endl;
+            // float dMag = sqrt(pow(deltaX, 2) + pow(deltaY, 2) + pow(deltaZ, 2));
+            // cout << dMag << endl;
+            // if (dMag < tollorance)
+            // {
+            //     break;
+            // }
+            // ros::spinOnce();
+            // ros::Duration(0.5).sleep();
+            // if (i == 1)
+            // {
+            //     ROS_INFO("Failed to reach destination. Stepping to next task.");
+            // }
         }
         ROS_INFO("Done moving foreward.");
     }
