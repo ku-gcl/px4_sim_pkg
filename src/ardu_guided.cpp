@@ -219,7 +219,8 @@ int main(int argc, char **argv)
         for (int i = 10000; ros::ok() && i > 0; --i)
         {
             ros::Time now = ros::Time::now();
-            setDestination(cos(0.1 * (now - last_request)), sin(0.1 * (now - last_request)), 1.5);
+            double t = (now - last_request).stamp.toSec();
+            setDestination(cos(0.1 * t), sin(0.1 * t), 1.5);
             local_pos_pub.publish(pose);
 
             // float deltaX = abs(pose.pose.position.x - current_pose.pose.position.x);
