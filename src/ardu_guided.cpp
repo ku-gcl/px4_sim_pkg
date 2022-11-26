@@ -233,8 +233,8 @@ int main(int argc, char **argv)
             // {
             //     break;
             // }
-            // ros::spinOnce();
-            // ros::Duration(0.5).sleep();
+            ros::spinOnce();
+            ros::Duration(0.5).sleep();
             // if (i == 1)
             // {
             //     ROS_INFO("Failed to reach destination. Stepping to next task.");
