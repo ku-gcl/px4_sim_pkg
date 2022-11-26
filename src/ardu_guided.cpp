@@ -219,7 +219,7 @@ int main(int argc, char **argv)
         for (int i = 10000; ros::ok() && i > 0; --i)
         {
             ros::Time now = ros::Time::now();
-            double t = (now - last_request).stamp.toSec();
+            double t = (now - last_request).toSec();
             setDestination(cos(0.1 * t), sin(0.1 * t), 1.5);
             local_pos_pub.publish(pose);
 
