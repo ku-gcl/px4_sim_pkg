@@ -19,6 +19,8 @@
 #include <math.h>
 #include <ros/duration.h>
 
+using namespace std;
+
 // Set global variables
 mavros_msgs::State current_state;
 // nav_msgs::Odometry current_pose;
@@ -102,7 +104,7 @@ int main(int argc, char **argv)
     ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
     ros::Publisher set_gp_origin_pub = nh.advertise<geographic_msgs::GeoPointStamped>("mavros/global_position/set_gp_origin", 10);
     ros::ServiceClient takeoff_client = nh.serviceClient<mavros_msgs::CommandTOL>("mavros/cmd/takeoff");
-    ros::Subscriber currentPos = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/global_position/pose", 10, );
+    // ros::Subscriber currentPos = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/global_position/pose", 10, );
     ros::Subscriber currentHeading = nh.subscribe<std_msgs::Float64>("/mavros/global_position/compass_hdg", 10, heading_cb);
 
     // the setpoint publishing rate MUST be faster than 2Hz
