@@ -255,7 +255,6 @@ int main(int argc, char **argv)
         {
             ros::Time now = ros::Time::now();
             double t = (now - last_request).toSec();
-            setDestination(cos(omega * t), sin(omega * t), 1.5);
             setHeading(0);
             if (MODE == "circle")
             {
