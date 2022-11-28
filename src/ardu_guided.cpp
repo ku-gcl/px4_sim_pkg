@@ -215,13 +215,14 @@ int main(int argc, char **argv)
     sleep(5);
     ros::Time last_request = ros::Time::now();
     ROS_INFO("moving start");
+    double omega = 0.6;
     if (local_pos_pub)
     {
         for (int i = 10000; ros::ok() && i > 0; --i)
         {
             ros::Time now = ros::Time::now();
             double t = (now - last_request).toSec();
-            setDestination(cos(0.1 * t), sin(0.1 * t), 1.5);
+            setDestination(cos(omega * t), sin(omega * t), 1.5);
             setHeading(0);
             // setDestination(1.0, 0, 1.0);
             local_pos_pub.publish(pose);
