@@ -225,7 +225,7 @@ int main(int argc, char **argv)
     sleep(5);
     ros::Time last_request = ros::Time::now();
     ROS_INFO("moving start");
-    double omega = 0.1; // 0.6
+    double omega = 0.6; // 0.6
     // double HEIGHT = current_pose.pose.position.z;
 
     if (local_pos_pub)
