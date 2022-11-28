@@ -28,6 +28,7 @@ geometry_msgs::PoseStamped current_pose;
 geometry_msgs::PoseStamped pose;
 std_msgs::Float64 current_heading;
 float GYM_OFFSET;
+double omega;
 
 // circle, updown, eight
 string MODE = "circle";
@@ -214,19 +215,19 @@ int main(int argc, char **argv)
     {
         ROS_INFO("CIRCLE");
         setDestination(1.0, 0, 1.5);
-        double omega = 0.6;
+        omega = 0.6;
     }
     else if (MODE == "updown")
     {
         ROS_INFO("UPDOWN");
         setDestination(1.0, 0, 1.0);
-        double omega = 0.6;
+        omega = 0.6;
     }
     else if (MODE == "eight")
     {
         ROS_INFO("EIGHT");
         setDestination(0, 0, 1.5);
-        double omega = 0.5;
+        omega = 0.5;
     }
     else
     {
