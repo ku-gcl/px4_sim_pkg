@@ -219,11 +219,11 @@ int main(int argc, char **argv)
     {
         for (int i = 10000; ros::ok() && i > 0; --i)
         {
-            // ros::Time now = ros::Time::now();
-            // double t = (now - last_request).toSec();
-            // setDestination(cos(0.1 * t), sin(0.1 * t), 1.5);
+            ros::Time now = ros::Time::now();
+            double t = (now - last_request).toSec();
+            setDestination(cos(0.1 * t), sin(0.1 * t), 1.5);
             setHeading(0);
-            setDestination(1.0, 0, 1.0);
+            // setDestination(1.0, 0, 1.0);
             local_pos_pub.publish(pose);
 
             // float deltaX = abs(pose.pose.position.x - current_pose.pose.position.x);
