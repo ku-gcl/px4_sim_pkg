@@ -162,7 +162,6 @@ int main(int argc, char **argv)
         ros::spinOnce();
         rate.sleep();
     }
-    ROS_INFO("finished sending a few setpoints");
 
     // mavros_msgs::SetMode offb_set_mode;
     // // for PX4
@@ -213,7 +212,15 @@ int main(int argc, char **argv)
     setHeading(0);
     setDestination(1.0, 0, 1.0);
     float tollorance = .35;
-    local_pos_pub.publish(pose);
+    // send a few setpoints before starting
+    ROS_INFO("send a few setpoints");
+    for (int i = 100; ros::ok() && i > 0; --i)
+    {
+        local_pos_pub.publish(pose);
+        ros::spinOnce();
+        rate.sleep();
+    }
+    ROS_INFO("finished sending a few setpoints");
 
     sleep(5);
     ros::Time last_request = ros::Time::now();
