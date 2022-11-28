@@ -208,10 +208,31 @@ int main(int argc, char **argv)
 
     sleep(5);
 
-    // move foreward
+    // move start point
     setHeading(0);
-    setDestination(1.0, 0, 1.0);
-    float tollorance = .35;
+    if (MODE == "circle")
+    {
+        ROS_INFO("CIRCLE");
+        setDestination(1.0, 0, 1.5);
+        double omega = 0.6;
+    }
+    else if (MODE == "updown")
+    {
+        ROS_INFO("UPDOWN");
+        setDestination(1.0, 0, 1.0);
+        double omega = 0.6;
+    }
+    else if (MODE == "eight")
+    {
+        ROS_INFO("EIGHT");
+        setDestination(0, 0, 1.5);
+        double omega = 0.5;
+    }
+    else
+    {
+        ROS_ERROR("You should set flight mode: circle/updown/eight");
+    }
+
     // send a few setpoints before starting
     ROS_INFO("send a few setpoints");
     for (int i = 100; ros::ok() && i > 0; --i)
@@ -225,8 +246,7 @@ int main(int argc, char **argv)
     sleep(5);
     ros::Time last_request = ros::Time::now();
     ROS_INFO("moving start");
-    double omega = 0.6; // 0.6
-    // double HEIGHT = current_pose.pose.position.z;
+    double HEIGHT = current_pose.pose.position.z;
 
     if (local_pos_pub)
     {
@@ -236,49 +256,31 @@ int main(int argc, char **argv)
             double t = (now - last_request).toSec();
             setDestination(cos(omega * t), sin(omega * t), 1.5);
             setHeading(0);
-            // if (MODE == "circle")
-            // {
-            //     ROS_INFO("CIRCLE");
-            //     setDestination(cos(omega * t), sin(omega * t), 1.5);
-            //     setHeading(0);
-            // }
-            // else if (MODE == "updown")
-            // {
-            //     ROS_INFO("UPDOWN");
-            //     setDestination(0, 0, 0.5 * sin(omega * t) + HEIGHT);
-            //     setHeading(0);
-            // }
-            // else if (MODE == "eight")
-            // {
-            //     // TODO
-            //     ROS_INFO("EIGHT");
-            //     setDestination(0, 0, 0);
-            //     setHeading(0);
-            // }
-            // else
-            // {
-            //     ROS_ERROR("You should set flight mode: circle/updown/eight");
-            // }
+            if (MODE == "circle")
+            {
+                setDestination(cos(omega * t), sin(omega * t), 1.5);
+                setHeading(0);
+            }
+            else if (MODE == "updown")
+            {
+                setDestination(0, 0, 0.5 * sin(omega * t) + HEIGHT);
+                setHeading(0);
+            }
+            else if (MODE == "eight")
+            {
+                setDestination(1.0 * sin(omega * t), 0, 1.0 * cos(omega * t) * sin(omega * t) + HEIGHT);
+                setHeading(0);
+            }
+            else
+            {
+                ROS_ERROR("You should set flight mode: circle/updown/eight");
+            }
 
             // setDestination(1.0, 0, 1.0);
             local_pos_pub.publish(pose);
 
-            // float deltaX = abs(pose.pose.position.x - current_pose.pose.position.x);
-            // float deltaY = abs(pose.pose.position.y - current_pose.pose.position.y);
-            // float deltaZ = abs(pose.pose.position.z - current_pose.pose.position.z);
-            // // cout << " dx " << deltaX << " dy " << deltaY << " dz " << deltaZ << endl;
-            // float dMag = sqrt(pow(deltaX, 2) + pow(deltaY, 2) + pow(deltaZ, 2));
-            // cout << dMag << endl;
-            // if (dMag < tollorance)
-            // {
-            //     break;
-            // }
             ros::spinOnce();
             ros::Duration(0.5).sleep();
-            // if (i == 1)
-            // {
-            //     ROS_INFO("Failed to reach destination. Stepping to next task.");
-            // }
         }
         ROS_INFO("Done moving foreward.");
     }
