@@ -28,10 +28,9 @@ geometry_msgs::PoseStamped current_pose;
 geometry_msgs::PoseStamped pose;
 std_msgs::Float64 current_heading;
 float GYM_OFFSET;
-string MODE;
 
 // circle, updown, eight
-MODE = "circle";
+string MODE = "circle";
 
 // get armed state
 void state_cb(const mavros_msgs::State::ConstPtr &msg)
