@@ -220,7 +220,7 @@ int main(int argc, char **argv)
     else if (MODE == "updown")
     {
         ROS_INFO("UPDOWN");
-        setDestination(1.0, 0, 1.0);
+        setDestination(0, 0, 1.5);
         omega = 0.6;
     }
     else if (MODE == "eight")
