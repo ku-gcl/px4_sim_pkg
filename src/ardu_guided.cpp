@@ -218,7 +218,7 @@ int main(int argc, char **argv)
     sleep(5);
     ros::Time last_request = ros::Time::now();
     ROS_INFO("moving start");
-    double omega = 0.6;
+    double omega = 0.1; // 0.6
     double HEIGHT = current_pose.pose.position.z;
 
     if (local_pos_pub)
@@ -227,20 +227,22 @@ int main(int argc, char **argv)
         {
             ros::Time now = ros::Time::now();
             double t = (now - last_request).toSec();
-
             if (MODE == "circle")
             {
+                ROS_INFO("CIRCLE");
                 setDestination(cos(omega * t), sin(omega * t), 1.5);
                 setHeading(0);
             }
             else if (MODE == "updown")
             {
+                ROS_INFO("UPDOWN");
                 setDestination(0, 0, 0.5 * sin(omega * t) + HEIGHT);
                 setHeading(0);
             }
             else if (MODE == "eight")
             {
                 // TODO
+                ROS_INFO("EIGHT");
                 setDestination(0, 0, 0);
                 setHeading(0);
             }
