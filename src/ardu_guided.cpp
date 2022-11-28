@@ -263,7 +263,8 @@ int main(int argc, char **argv)
             }
             else if (MODE == "updown")
             {
-                ROS_INFO(HEIGHT);
+                cout << HEIGHT << "\n"
+                     << endl;
                 setDestination(0, 0, 0.5 * sin(omega * t) + HEIGHT);
                 setHeading(0);
             }
