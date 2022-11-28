@@ -232,7 +232,7 @@ int main(int argc, char **argv)
     {
         ROS_INFO("EIGHT");
         setDestination(0, 0, 1.5);
-        omega = 0.5;
+        omega = 0.6;
         HEIGHT = 1.5;
     }
     else
