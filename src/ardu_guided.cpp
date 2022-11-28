@@ -29,6 +29,7 @@ geometry_msgs::PoseStamped pose;
 std_msgs::Float64 current_heading;
 float GYM_OFFSET;
 double omega;
+double HEIGHT;
 
 // circle, updown, eight
 string MODE = "circle";
@@ -216,18 +217,21 @@ int main(int argc, char **argv)
         ROS_INFO("CIRCLE");
         setDestination(1.0, 0, 1.5);
         omega = 0.6;
+        HEIGHT = 1.5;
     }
     else if (MODE == "updown")
     {
         ROS_INFO("UPDOWN");
         setDestination(0, 0, 1.5);
         omega = 0.6;
+        HEIGHT = 1.5;
     }
     else if (MODE == "eight")
     {
         ROS_INFO("EIGHT");
         setDestination(0, 0, 1.5);
         omega = 0.5;
+        HEIGHT = 1.5;
     }
     else
     {
@@ -247,7 +251,6 @@ int main(int argc, char **argv)
     sleep(5);
     ros::Time last_request = ros::Time::now();
     ROS_INFO("moving start");
-    double HEIGHT = current_pose.pose.position.z;
 
     if (local_pos_pub)
     {
