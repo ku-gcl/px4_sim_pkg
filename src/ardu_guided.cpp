@@ -32,7 +32,9 @@ double omega;
 double HEIGHT;
 
 // circle, updown, eight
-string MODE = "circle";
+// string MODE = "circle";
+// string MODE = "updown";
+string MODE = "eight";
 
 // get armed state
 void state_cb(const mavros_msgs::State::ConstPtr &msg)
@@ -223,7 +225,7 @@ int main(int argc, char **argv)
     {
         ROS_INFO("UPDOWN");
         setDestination(0, 0, 1.5);
-        omega = 0.6;
+        omega = 0.7;
         HEIGHT = 1.5;
     }
     else if (MODE == "eight")
