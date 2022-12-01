@@ -33,9 +33,9 @@ double HEIGHT;
 double LOOP_RATE = 0.1;
 
 // circle, updown, eight
-// string MODE = "circle";
+string MODE = "circle";
 // string MODE = "updown";
-string MODE = "eight";
+// string MODE = "eight";
 
 // get armed state
 void state_cb(const mavros_msgs::State::ConstPtr &msg)
