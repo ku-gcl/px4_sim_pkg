@@ -30,6 +30,7 @@ std_msgs::Float64 current_heading;
 float GYM_OFFSET;
 double omega;
 double HEIGHT;
+double LOOP_RATE = 0.1;
 
 // circle, updown, eight
 // string MODE = "circle";
@@ -287,7 +288,7 @@ int main(int argc, char **argv)
             local_pos_pub.publish(pose);
 
             ros::spinOnce();
-            ros::Duration(0.5).sleep();
+            ros::Duration(LOOP_RATE).sleep();
         }
         ROS_INFO("Done moving foreward.");
     }
