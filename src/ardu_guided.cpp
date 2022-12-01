@@ -33,9 +33,9 @@ double HEIGHT;
 double LOOP_RATE = 0.1;
 
 // circle, updown, eight
-// string MODE = "circle";
+string MODE = "circle";
 // string MODE = "updown";
-string MODE = "eight";
+// string MODE = "eight";
 
 // get armed state
 void state_cb(const mavros_msgs::State::ConstPtr &msg)
@@ -261,23 +261,20 @@ int main(int argc, char **argv)
         {
             ros::Time now = ros::Time::now();
             double t = (now - last_request).toSec();
-            setHeading(0);
+            setHeading(45);
             if (MODE == "circle")
             {
                 setDestination(cos(omega * t), sin(omega * t), 1.5);
-                setHeading(0);
             }
             else if (MODE == "updown")
             {
                 // cout << HEIGHT << "\n"
                 //      << endl;
                 setDestination(0, 0, 0.5 * sin(omega * t) + HEIGHT);
-                setHeading(0);
             }
             else if (MODE == "eight")
             {
                 setDestination(1.0 * sin(omega * t), 0, 1.0 * cos(omega * t) * sin(omega * t) + HEIGHT);
-                setHeading(0);
             }
             else
             {
