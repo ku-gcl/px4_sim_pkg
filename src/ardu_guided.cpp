@@ -265,19 +265,16 @@ int main(int argc, char **argv)
             if (MODE == "circle")
             {
                 setDestination(cos(omega * t), sin(omega * t), 1.5);
-                setHeading(0);
             }
             else if (MODE == "updown")
             {
                 // cout << HEIGHT << "\n"
                 //      << endl;
                 setDestination(0, 0, 0.5 * sin(omega * t) + HEIGHT);
-                setHeading(0);
             }
             else if (MODE == "eight")
             {
                 setDestination(1.0 * sin(omega * t), 0, 1.0 * cos(omega * t) * sin(omega * t) + HEIGHT);
-                setHeading(0);
             }
             else
             {
