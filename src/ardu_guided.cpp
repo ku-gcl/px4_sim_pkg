@@ -253,11 +253,13 @@ int main(int argc, char **argv)
 
     sleep(5);
     ros::Time last_request = ros::Time::now();
+    ros::Time start_time = ros::Time::now();
     ROS_INFO("moving start");
 
     if (local_pos_pub)
     {
-        for (int i = 10000; ros::ok() && i > 0; --i)
+        // for (int i = 10000; ros::ok() && i > 0; --i)
+        while (ros::Time::now() - start_time < ros::Duration(30.0))
         {
             ros::Time now = ros::Time::now();
             double t = (now - last_request).toSec();
