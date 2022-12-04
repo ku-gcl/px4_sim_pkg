@@ -259,7 +259,7 @@ int main(int argc, char **argv)
     if (local_pos_pub)
     {
         // for (int i = 10000; ros::ok() && i > 0; --i)
-        while (ros::ok() && (ros::Time::now() - start_time) < ros::Duration(30.0))
+        while (ros::ok() && (ros::Time::now() - start_time) < ros::Duration(300.0))
         {
             ros::Time now = ros::Time::now();
             double t = (now - last_request).toSec();
