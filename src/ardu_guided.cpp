@@ -218,7 +218,7 @@ int main(int argc, char **argv)
     if (MODE == "circle")
     {
         ROS_INFO("CIRCLE");
-        setDestination(1.0, 0, 0.3);
+        setDestination(1.0, 0, 0.1);
         omega = 0.6;
         HEIGHT = 1.5;
     }
@@ -266,7 +266,7 @@ int main(int argc, char **argv)
             setHeading(0);
             if (MODE == "circle")
             {
-                setDestination(cos(omega * t), sin(omega * t), 0.3);
+                setDestination(cos(omega * t), sin(omega * t), 0.1);
             }
             else if (MODE == "updown")
             {
