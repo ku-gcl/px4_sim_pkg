@@ -32,7 +32,7 @@ double omega;
 double HEIGHT;
 double LOOP_RATE = 0.1;
 
-// circle, updown, eight
+// circle, updown, eight, hovering
 string MODE = "circle";
 // string MODE = "updown";
 // string MODE = "eight";
@@ -218,23 +218,30 @@ int main(int argc, char **argv)
     if (MODE == "circle")
     {
         ROS_INFO("CIRCLE");
-        setDestination(1.0, 0, 0.1);
         omega = 0.6;
         HEIGHT = 1.5;
+        setDestination(1.0, 0, HEIGHT);
     }
     else if (MODE == "updown")
     {
         ROS_INFO("UPDOWN");
-        setDestination(0, 0, 1.5);
         omega = 0.7;
         HEIGHT = 1.5;
+        setDestination(0, 0, HEIGHT);
     }
     else if (MODE == "eight")
     {
         ROS_INFO("EIGHT");
-        setDestination(0, 0, 1.5);
         omega = 0.6;
         HEIGHT = 1.5;
+        setDestination(0, 0, 1.5);
+    }
+    else if (MODE == "hovering")
+    {
+        ROS_INFO("HOVERING");
+        omega = 0.0;
+        HEIGHT = 1.5;
+        setDestination(0, 0, HEIGHT);
     }
     else
     {
@@ -266,7 +273,7 @@ int main(int argc, char **argv)
             setHeading(0);
             if (MODE == "circle")
             {
-                setDestination(cos(omega * t), sin(omega * t), 0.1);
+                setDestination(cos(omega * t), sin(omega * t), HEIGHT);
             }
             else if (MODE == "updown")
             {
@@ -277,6 +284,10 @@ int main(int argc, char **argv)
             else if (MODE == "eight")
             {
                 setDestination(1.0 * sin(omega * t), 0, 1.0 * cos(omega * t) * sin(omega * t) + HEIGHT);
+            }
+            else if (MODE == "hovering")
+            {
+                setDestination(0, 0, HEIGHT);
             }
             else
             {
