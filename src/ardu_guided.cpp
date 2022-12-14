@@ -33,10 +33,10 @@ double HEIGHT;
 double LOOP_RATE = 0.1;
 
 // circle, updown, eight, hovering
-string MODE = "circle";
+// string MODE = "circle";
 // string MODE = "updown";
 // string MODE = "eight";
-// string MODE = "hovering";
+string MODE = "hovering";
 
 // get armed state
 void state_cb(const mavros_msgs::State::ConstPtr &msg)
@@ -243,7 +243,7 @@ int main(int argc, char **argv)
     {
         ROS_INFO("HOVERING");
         omega = 0.0;
-        HEIGHT = 1.5;
+        HEIGHT = 1.0;
         setDestination(0, 0, HEIGHT);
     }
     else
