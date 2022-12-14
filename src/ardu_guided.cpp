@@ -159,7 +159,7 @@ int main(int argc, char **argv)
     // pose.pose.position.x = 0;
     // pose.pose.position.y = 0;
     // pose.pose.position.z = 1.5;
-    setDestination(0, 0, 1.5);
+    setDestination(0, 0, 0.5);
     // send a few setpoints before starting
     ROS_INFO("send a few setpoints");
     for (int i = 100; ros::ok() && i > 0; --i)
@@ -243,7 +243,7 @@ int main(int argc, char **argv)
     {
         ROS_INFO("HOVERING");
         omega = 0.0;
-        HEIGHT = 1.0;
+        HEIGHT = 0.5;
         setDestination(0, 0, HEIGHT);
     }
     else
