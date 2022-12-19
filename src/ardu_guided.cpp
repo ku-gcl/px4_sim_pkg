@@ -244,7 +244,7 @@ int main(int argc, char **argv)
         ROS_INFO("HOVERING");
         omega = 0.0;
         HEIGHT = 0.5;
-        setDestination(0, 0, HEIGHT);
+        setDestination(0, 1.0, HEIGHT);
     }
     else
     {
