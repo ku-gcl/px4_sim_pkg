@@ -32,7 +32,7 @@ double omega;
 double HEIGHT;
 double LOOP_RATE = 0.1;
 
-// Select flight MODE: circle, updown, eight, hovering
+// モードを選択: circle, updown, eight, hovering
 // string MODE = "circle";
 // string MODE = "updown";
 // string MODE = "eight";
@@ -166,17 +166,6 @@ int main(int argc, char **argv)
     }
 
     //////////////////////////////////////
-    // // プログラム側でモードを設定刷る場合はこちらを使用
-    // mavros_msgs::SetMode offb_set_mode;
-    // // for PX4
-    // // offb_set_mode.request.custom_mode = "OFFBOARD";
-    // // for Ardupilot
-    // offb_set_mode.request.custom_mode = "GUIDED";
-    // if (set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
-    // {
-    //     ROS_INFO("GUIDED enabled");
-    // }
-
     ROS_INFO("Change to GUIDED Mode");
     // プロポでモードをGuidedモードに変更する
     while (current_state.mode != "GUIDED")
@@ -268,7 +257,6 @@ int main(int argc, char **argv)
 
     if (local_pos_pub)
     {
-        // for (int i = 10000; ros::ok() && i > 0; --i)     // 指定の回数forloop
         // 300 secループを継続
         while (ros::ok() && (ros::Time::now() - start_time) < ros::Duration(300.0))
         {
@@ -295,8 +283,6 @@ int main(int argc, char **argv)
             {
                 ROS_ERROR("You should set flight mode: circle/updown/eight");
             }
-
-            // setDestination(1.0, 0, 1.0);
             local_pos_pub.publish(pose);
 
             ros::spinOnce();
@@ -322,8 +308,5 @@ int main(int argc, char **argv)
         ros::spinOnce();
         rate.sleep();
     }
-
-    // ros::Time last_request = ros::Time::now();
-
     return 0;
 }
