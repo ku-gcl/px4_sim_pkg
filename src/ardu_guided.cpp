@@ -36,10 +36,11 @@ double LOOP_RATE = 0.1;
 
 // 飛行モードを選択
 // Select flight MODE: circle, updown, eight, hovering
-// string MODE = "circle";
+string MODE = "circle";
 // string MODE = "updown";
+// string MODE = "rightleft";
 // string MODE = "eight";
-string MODE = "hovering";
+// string MODE = "hovering";
 
 // get armed state
 void state_cb(const mavros_msgs::State::ConstPtr &msg)
@@ -120,6 +121,7 @@ int main(int argc, char **argv)
 
     // the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
+    ROS_INFO("INITILIZING...");
 
     // wait for FCU connection
     while (ros::ok() && !current_state.connected)
@@ -236,6 +238,13 @@ int main(int argc, char **argv)
         HEIGHT = 1.5;
         setDestination(0, 0, HEIGHT);
     }
+    else if (MODE == "rightleft")
+    {
+        ROS_INFO("RIGHT AND LEFT");
+        omega = 0.7;
+        HEIGHT = 1.5;
+        setDestination(0, 0, HEIGHT);
+    }
     else if (MODE == "eight")
     {
         ROS_INFO("EIGHT");
@@ -272,9 +281,7 @@ int main(int argc, char **argv)
 
     if (local_pos_pub)
     {
-        // for (int i = 10000; ros::ok() && i > 0; --i)     // 指定の回数forloop
-        // 300 secループを継続
-        while (ros::ok() && (ros::Time::now() - start_time) < ros::Duration(300.0))
+        while (ros::ok() && (ros::Time::now() - start_time) < ros::Duration(120.0))
         {
             ros::Time now = ros::Time::now();
             double t = (now - last_request).toSec();
@@ -285,7 +292,11 @@ int main(int argc, char **argv)
             }
             else if (MODE == "updown")
             {
-                setDestination(0, 0, 0.5 * sin(omega * t) + HEIGHT);
+                setDestination(0, 0, 1.0 * sin(omega * t) + HEIGHT);
+            }
+            else if (MODE == "rightleft")
+            {
+                setDestination(1.0 * sin(omega * t), 0, HEIGHT);
             }
             else if (MODE == "eight")
             {
