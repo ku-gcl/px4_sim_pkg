@@ -226,7 +226,7 @@ int main(int argc, char **argv)
     {
         ROS_INFO("CIRCLE");
         omega = 0.6;
-        HEIGHT = 1.5;
+        HEIGHT = 1.0;
         // HEIGHT = 0.5;
         // HEIGHT = 0.3;
         setDestination(1.0, 0, HEIGHT);
