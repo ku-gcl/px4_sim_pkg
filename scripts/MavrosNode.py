@@ -171,7 +171,8 @@ class MavrosNode():
             rospy.logerr("Landing failed: %s" % e)
 
 
-rospy.init_node('offb_node')
+rospy.init_node('offb_node', anonymous=True)
+
 rate = rospy.Rate(20.0)
 mav = MavrosNode()
 rospy.loginfo("Initializing ...")
