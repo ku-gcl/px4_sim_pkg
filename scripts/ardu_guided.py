@@ -20,9 +20,6 @@ current_pose = PoseStamped()
 current_heading = Float64()
 current_rcout = RCOut()
 
-# class MavrosNode():
-    # def __init__():
-    #     self.
 
 
 def main():
