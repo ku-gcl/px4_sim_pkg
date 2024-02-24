@@ -171,9 +171,8 @@ class MavrosNode():
             rospy.logerr("Landing failed: %s" % e)
 
 
+rospy.init_node('offb_node')
 rate = rospy.Rate(20.0)
-
-
 mav = MavrosNode()
 rospy.loginfo("Initializing ...")
 # FCU接続を待つ

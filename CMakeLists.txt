@@ -61,5 +61,6 @@ include_directories(
 # Pythonスクリプトをインストールするための設定
 catkin_install_python(PROGRAMS
   scripts/ardu_guided.py
+  scripts/MavrosNode.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
