@@ -1,33 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import rospy
 import math
-from std_msgs.msg import Float64
 from geometry_msgs.msg import PoseStamped
 from geographic_msgs.msg import GeoPointStamped
 from mavros_msgs.srv import CommandBool, SetMode, CommandTOL
 from mavros_msgs.msg import State, RCOut
 from sensor_msgs.msg import Imu
 from tf.transformations import euler_from_quaternion
-from px4_sim_pkg.command import *
-from px4_sim_pkg.function import state_cb, rcout_cb, imu_cb, pose_cb, heading_cb
-from px4_sim_pkg.function import set_heading, set_destination, quaternion_from_euler
 
+# グローバル変数の定義
+# current_state = State()
+# current_rcout = RCOut()
 
+def state_cb(msg):
+    global current_state
+    current_state = msg
 
-GYM_OFFSET = 0.0
+def rcout_cb(msg):
+    global current_rcout
+    current_rcout = msg
+    # print("RC Channels 1-4: [%d, %d, %d, %d]" % (current_rcout.channels[0], current_rcout.channels[1], current_rcout.channels[2], current_rcout.channels[3]))
 
-current_state = State()
-current_pose = PoseStamped()
-current_heading = Float64()
-current_rcout = RCOut()
-
-# class MavrosNode():
-    # def __init__():
-    #     self.
-
+def imu_cb(msg):
+    global imu_data
+    orientation_q = msg.orientation
+    orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
+    roll, pitch, yaw = euler_from_quaternion(orientation_list)
+    # rospy.loginfo("Roll: %f, Pitch: %f, Yaw: %f" % (roll, pitch, yaw))
+    # rospy.loginfo("R: %5.2f, P: %5.2f, Y: %5.2f" % (roll, pitch, yaw))
 
 def main():
-    global current_state, current_rcout, current_pose, current_heading
-
     rospy.init_node('offb_node', anonymous=True)
     
     state_sub = rospy.Subscriber("mavros/state", State, state_cb)
@@ -44,8 +48,10 @@ def main():
     rospy.loginfo("Initializing ...")
     # FCU接続を待つ
     while not rospy.is_shutdown() and not current_state.connected:
-        rospy.loginfo("current_state.connected: %s" % (current_state.connected))
-        rospy.sleep(0.1)
+        # rospy.spin()
+        # rate.sleep()
+        rospy.sleep(0.01)
+        rospy.loginfo("Loop for waiting for connection...")
 
     rospy.loginfo("Waiting for connection...")
 
@@ -71,13 +77,25 @@ def main():
     rospy.loginfo("Done sending setpoint ...")
 
     # GUIDEDモードに設定
-    set_drone_to_guided_mode()
+    try:
+        set_mode_client(custom_mode="GUIDED")
+        rospy.loginfo("Guided enabled")
+    except rospy.ServiceException as e:
+        rospy.logerr("Set mode failed: %s" % e)
 
     # 機体のアーム
-    arm_vehicle()
+    try:
+        arming_client(True)
+        rospy.loginfo("Vehicle armed")
+    except rospy.ServiceException as e:
+        rospy.logerr("Arming failed: %s" % e)
 
     # 離陸
-    vehicle_takeoff(1.5)
+    try:
+        takeoff_client(altitude=1.5)
+        rospy.loginfo("Takeoff sent")
+    except rospy.ServiceException as e:
+        rospy.logerr("Takeoff failed: %s" % e)
 
     rospy.sleep(5)
 
@@ -95,7 +113,12 @@ def main():
         rospy.sleep(0.1)
 
     # 着陸
-    send_land_command()
+    try:
+        land_client = rospy.ServiceProxy("/mavros/cmd/land", CommandTOL)
+        land_client()
+        rospy.loginfo("Land sent")
+    except rospy.ServiceException as e:
+        rospy.logerr("Landing failed: %s" % e)
 
 if __name__ == '__main__':
     try:
