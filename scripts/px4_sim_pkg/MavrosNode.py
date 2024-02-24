@@ -45,7 +45,7 @@ class MavrosNode():
     
     def state_cb(self, msg):
         self.current_state = msg
-        rospy.loginfo(f"Connected: {msg.connected}, Armed: {msg.armed}")
+        # rospy.loginfo(f"Connected: {msg.connected}, Armed: {msg.armed}")
 
     def rcout_cb(self, msg):
         self.current_rcout = msg

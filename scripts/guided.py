@@ -1,7 +1,7 @@
 
 import rospy
 import math
-import scripts.px4_sim_pkg.MavrosNode as MavrosNode
+import px4_sim_pkg.MavrosNode as MavrosNode
 
 rospy.init_node('offb_node', anonymous=True)
 
