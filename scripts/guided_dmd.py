@@ -85,8 +85,10 @@ while (not rospy.is_shutdown()
 
 # hovering for calculation
 rospy.loginfo("Hover for DMD calculation")
+rospy.sleep(2.0)
 x, y, z = trajectory.hover(time_sec, x=1.0, y=0.0, altitude=altitude)
 mav.set_local_position(x, y, z)
+rospy.sleep(2.0)
 
 
 # preprocessing and DMD implementation
