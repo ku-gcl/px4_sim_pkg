@@ -103,12 +103,26 @@ A = dmd.DMD()
 rospy.loginfo("DMD calculation end")
 rospy.sleep(5)
 
-
-# flight with prediction
-# TODO: publish
 rospy.loginfo(A)
 
 
+# flight with prediction
+# TODO: publish
+rospy.loginfo("Start circle trajectory with DMD")
+while (not rospy.is_shutdown() 
+        and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
+    time_sec = (rospy.Time.now() - start_time).to_sec()
+
+    x, y, z = trajectory.circle(time_sec, radius=1.0, altitude=altitude)
+    mav.set_local_position(x, y, z)
+    data = [mav.imu, mav.rcout_norm, ]
+    
+    # mav.imu, mav.rcout_norm, mav.force_and_torque[1:4, 1]
+    imu_data.append(mav.imu)
+    rcout_data.append(mav.rcout_norm)
+    force_and_torque.append(mav.force_and_torque)
+
+    rate_ctrl.sleep()
 
 
 # 着陸
