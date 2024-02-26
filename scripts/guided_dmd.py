@@ -31,7 +31,7 @@ latitude = 33.595270
 longitude = 130.215496
 mav.set_gp_position(latitude, longitude)
 
-altitude = 1.5
+altitude = 1.0
 
 # セットポイントを送信
 rospy.loginfo("Sending setpoint ...")
@@ -48,7 +48,7 @@ mav.set_drone_to_guided_mode_manual()
 mav.arm_vehicle()
 
 # 離陸
-mav.vehicle_takeoff(1.0)
+mav.vehicle_takeoff(altitude)
 
 rospy.sleep(5)
 x, y, z = trajectory.circle(0, radius=1.0, altitude=altitude)
