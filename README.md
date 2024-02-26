@@ -28,8 +28,9 @@ catkin_make
 ## ノードの起動
 
 ```
-roslaunch apm.launch fcu_url:=/dev/ttyS0:921600 gcs_url:=udp://:14550@192.168.xxx.xxx:14557
-rosrun px4_sim_pkg ardu_guided
+roslaunch px4_sim_pkg experiment.launch
+
+# roslaunch px4_sim_pkg.launch fcu_url:=/dev/ttyS0:921600 gcs_url:=udp://:14550@192.168.xxx.xxx:14557
 ```
 
 ## Rosbag の開始
