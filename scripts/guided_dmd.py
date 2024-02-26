@@ -45,10 +45,17 @@ mav.vehicle_takeoff(1.0)
 
 rospy.sleep(5)
 
+# データ格納の配列を用意
+imu_data = []
+rcout_data = []
+force_and_torque = []
+
 
 # メインループ
 start_time = rospy.Time.now()
 duration = 10.0
+rate_ctrl = rospy.Rate(10)
+
 rospy.loginfo("Start circle trajectory")
 while (not rospy.is_shutdown() 
         and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
@@ -56,8 +63,14 @@ while (not rospy.is_shutdown()
 
     x, y, z = trajectory.circle(time_sec, radius=1.0, altitude=altitude)
     mav.set_local_position(x, y, z)
+    
+    # data collecting
+    imu_data.append(mav.imu)
+    rcout_data.append(mav.rcout.normalize)
+    force_and_torque.append(mav.force_and_torque)
 
-    rospy.sleep(0.1)
+    rate_ctrl.sleep()
+    # rospy.sleep(0.1)
 
 
 # hovering and DMD
@@ -65,11 +78,16 @@ rospy.loginfo("DMD calculation start")
 x, y, z = trajectory.hover(time_sec, x=1.0, y=0.0, altitude=altitude)
 mav.set_local_position(x, y, z)
 
-# TODO: DMD implementation
+# TODO: preprocessing and DMD implementation
+
 
 rospy.loginfo("DMD calculation end")
 rospy.sleep(5)
 
+
+# flight with prediction
+
+# TODO: publish
 
 
 

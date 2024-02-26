@@ -27,10 +27,10 @@ class MavrosNode():
         self.takeoff_client = rospy.ServiceProxy("mavros/cmd/takeoff", CommandTOL)
         self.land_client = rospy.ServiceProxy("mavros/cmd/land", CommandTOL)
         
-        self.imu.roll, self.imu.pitch, self.imu.yaw = 0.0, 0.0, 0.0
-        # self.rcou.c1, self.rcou.c2, self.rcou.c3, self.rcou.c4 = 0.0, 0.0, 0.0, 0.0
-        
-        self.rcout.thrust, self.rcout.roll, self.rcout.pitch, self.rcout.yaw = 0, 0, 0, 0
+        self.imu = [0, 0, 0, 0, 0, 0]
+        self.rcout = [0, 0, 0, 0]
+        self.rcout.normalize = [0, 0, 0, 0]
+        self.force_and_torque = [0, 0, 0, 0]
 
 
     def quaternion_from_euler(self, roll, pitch, yaw):
@@ -52,10 +52,9 @@ class MavrosNode():
         self.current_state = msg
         # rospy.loginfo(f"Connected: {msg.connected}, Armed: {msg.armed}")
         
-    def rcout_normalize(self):
+    def rcout_normalize(self, rcout):
         # f = lambda c: 1/500*c-3, f(1000)
-        C = self.current_rcout
-        C1, C2, C3, C4 = C.channels[0], C.channels[1], C.channels[2], C.channels[3]
+        C1, C2, C3, C4 = rcout.channels[0], rcout.channels[1], rcout.channels[2], rcout.channels[3]
         c1 = 1/500*C1-3
         c2 = 1/500*C2-3
         c3 = 1/500*C3-3
@@ -63,20 +62,17 @@ class MavrosNode():
         return c1, c2, c3, c4
         
     def rcout_cb(self, msg):
-        self.current_rcout = msg
-        # print("RC Channels 1-4: [%d, %d, %d, %d]" % (self.current_rcout.channels[0], self.current_rcout.channels[1], self.current_rcout.channels[2], self.current_rcout.channels[3]))
-        # self.rcou.c1 = self.current_rcout.channels[0]
-        # self.rcou.c2 = self.current_rcout.channels[1]
-        # self.rcou.c3 = self.current_rcout.channels[2]
-        # self.rcou.c4 = self.current_rcout.channels[3]
-        
+        rcout = msg
         # normalize from -1 to 1
-        c1, c2, c3, c4 = self.rcout_normalize(self.current_rcout)
-        self.rcout.thrust =  (c1 + c2 + c3 + c4)/4
-        self.rcout.roll   = (-c1 + c2 + c3 - c4)/4
-        self.rcout.pitch  =  (c1 - c2 + c3 - c4)/4
-        self.rcout.yaw    =  (c1 + c2 - c3 - c4)/4
+        c1, c2, c3, c4 = self.rcout_normalize(rcout)
+        thrust =  (c1 + c2 + c3 + c4)/4
+        roll   = (-c1 + c2 + c3 - c4)/4
+        pitch  =  (c1 - c2 + c3 - c4)/4
+        yaw    =  (c1 + c2 - c3 - c4)/4
         
+        self.rcout = [rcout.channels[0], rcout.channels[1], rcout.channels[2], rcout.channels[3]]
+        self.rcout.normalize = [c1, c2, c3, c4]
+        self.force_and_torque = [thrust, roll, pitch, yaw]
         
 
     def imu_cb(self, msg):
@@ -89,13 +85,7 @@ class MavrosNode():
         angvel = msg.angular_velocity
         
         # 姿勢角と角速度をimuに格納
-        # self.imu = []
-        self.imu.roll = roll
-        self.imu.pitch = pitch
-        self.imu.yaw = yaw
-        self.imu.angvelx = angvel.x
-        self.imu.angvely = angvel.y
-        self.imu.angvelz = angvel.z
+        self.imu = [roll, pitch, yaw, angvel.x, angvel.y, angvel.z]
     
     
     def pose_cb(self, msg):
