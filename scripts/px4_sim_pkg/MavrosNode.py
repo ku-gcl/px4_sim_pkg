@@ -29,7 +29,7 @@ class MavrosNode():
         
         self.imu = [0, 0, 0, 0, 0, 0]
         self.rcout = [0, 0, 0, 0]
-        self.rcout.normalize = [0, 0, 0, 0]
+        self.rcout_norm = [0, 0, 0, 0]
         self.force_and_torque = [0, 0, 0, 0]
 
 
@@ -71,7 +71,7 @@ class MavrosNode():
         yaw    =  (c1 + c2 - c3 - c4)/4
         
         self.rcout = [rcout.channels[0], rcout.channels[1], rcout.channels[2], rcout.channels[3]]
-        self.rcout.normalize = [c1, c2, c3, c4]
+        self.rcout_norm = [c1, c2, c3, c4]
         self.force_and_torque = [thrust, roll, pitch, yaw]
         
 

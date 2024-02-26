@@ -66,7 +66,7 @@ while (not rospy.is_shutdown()
     
     # data collecting
     imu_data.append(mav.imu)
-    rcout_data.append(mav.rcout.normalize)
+    rcout_data.append(mav.rcout_norm)
     force_and_torque.append(mav.force_and_torque)
 
     rate_ctrl.sleep()
