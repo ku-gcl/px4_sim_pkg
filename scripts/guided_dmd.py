@@ -5,8 +5,12 @@ import numpy as np
 import px4_sim_pkg.MavrosNode as MavrosNode
 import px4_sim_pkg.Trajectory as Trajectory
 import px4_sim_pkg.DMD as DMD
+from std_msgs.msg import Float64MultiArray  # 予測された状態をパブリッシュするために使用
 
 rospy.init_node('offb_node', anonymous=True)
+
+pred_state_pub = rospy.Publisher('/dmd/predict_state', Float64MultiArray, queue_size=10)
+
 
 rate = rospy.Rate(20.0)
 mav = MavrosNode.MavrosNode()
@@ -115,12 +119,22 @@ while (not rospy.is_shutdown()
 
     x, y, z = trajectory.circle(time_sec, radius=1.0, altitude=altitude)
     mav.set_local_position(x, y, z)
-    data = [mav.imu, mav.rcout_norm, ]
     
-    # mav.imu, mav.rcout_norm, mav.force_and_torque[1:4, 1]
-    imu_data.append(mav.imu)
-    rcout_data.append(mav.rcout_norm)
-    force_and_torque.append(mav.force_and_torque)
+    # mav.imu, mav.rcout_norm, mav.force_and_torqueをNumPy配列に変換
+    imu_np = np.array(mav.imu)
+    rcout_norm_np = np.array(mav.rcout_norm)
+    force_and_torque_np = np.array(mav.force_and_torque)[1:4]  # [1:4]で特定の要素を抽出
+    
+    # これらを1行のベクトルに変換
+    data_vector = np.concatenate([imu_np, rcout_norm_np, force_and_torque_np])
+
+    # DMDによる状態予測
+    x_k1 = dmd.predictstate(data_vector)  # reshape(-1, 1)で2次元配列に変換
+
+    # 予測された状態x_k1を/dmd/predict_stateとしてpublish
+    pred_msg = Float64MultiArray()
+    pred_msg.data = x_k1.flatten()  # flatten()で1次元配列に変換
+    pred_state_pub.publish(pred_msg)
 
     rate_ctrl.sleep()
 
