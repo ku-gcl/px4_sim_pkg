@@ -154,17 +154,9 @@ class MavrosNode():
         """
         ドローンをGUIDEDモードに手動で設定する関数。
         """
-        while not rospy.is_shutdown():
-            if self.current_state.mode != "GUIDED":
-                try:
-                    # GUIDEDモードに設定
-                    self.set_mode_client(custom_mode="GUIDED")
-                    rospy.loginfo("Switched to GUIDED Mode")
-                except rospy.ServiceException as e:
-                    rospy.logerr("Set mode service call failed: %s" % e)
-            else:
-                rospy.loginfo("Already in GUIDED Mode")
-                break
+        rospy.loginfo("Switched to GUIDED Mode")
+
+        while self.current_state.mode != "GUIDED":
             rospy.sleep(0.1)
 
 
