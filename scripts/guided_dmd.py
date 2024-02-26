@@ -3,6 +3,7 @@ import rospy
 import math
 import px4_sim_pkg.MavrosNode as MavrosNode
 import px4_sim_pkg.Trajectory as Trajectory
+import px4_sim_pkg.DMD as DMD
 
 rospy.init_node('offb_node', anonymous=True)
 
@@ -73,20 +74,35 @@ while (not rospy.is_shutdown()
     # rospy.sleep(0.1)
 
 
-# hovering and DMD
-rospy.loginfo("DMD calculation start")
+# TODO: CSV出力
+
+
+# hovering for calculation
+rospy.loginfo("Hover for DMD calculation")
 x, y, z = trajectory.hover(time_sec, x=1.0, y=0.0, altitude=altitude)
 mav.set_local_position(x, y, z)
 
-# TODO: preprocessing and DMD implementation
 
+# preprocessing and DMD implementation
+rospy.loginfo("DMD calculation start")
+# TODO: add data preprocessing
+y = imu_data
 
+# TODO: changed u -> 4row to 3row
+u = force_and_torque[0:3, :]
+stateDim, _ = y.shape
+inputDim, _ = u.shape
+aug = 1 
+
+dmd = DMD()
+Y = dmd.concatenate(y, u)
+dmd.splitdata(XX=Y, stateDim=stateDim, aug=aug)
+A = dmd.DMD()
 rospy.loginfo("DMD calculation end")
 rospy.sleep(5)
 
 
 # flight with prediction
-
 # TODO: publish
 
 

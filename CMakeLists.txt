@@ -62,5 +62,6 @@ include_directories(
 catkin_install_python(PROGRAMS
   # scripts/archive/ardu_guided.py
   scripts/guided.py
+  scripts/guided_dmd.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
