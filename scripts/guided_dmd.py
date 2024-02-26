@@ -1,6 +1,7 @@
 
 import rospy
 import math
+import numpy as np
 import px4_sim_pkg.MavrosNode as MavrosNode
 import px4_sim_pkg.Trajectory as Trajectory
 import px4_sim_pkg.DMD as DMD
@@ -86,15 +87,16 @@ mav.set_local_position(x, y, z)
 # preprocessing and DMD implementation
 rospy.loginfo("DMD calculation start")
 # TODO: add data preprocessing
-y = imu_data
 
-# TODO: changed u -> 4row to 3row
-u = force_and_torque[0:3, :]
+# list to nparray
+y = np.array(imu_data).T
+u = np.array(force_and_torque).T
+u = u[1:4, :]      # extract torque only
 stateDim, _ = y.shape
 inputDim, _ = u.shape
 aug = 1 
 
-dmd = DMD()
+dmd = DMD.DMD()
 Y = dmd.concatenate(y, u)
 dmd.splitdata(XX=Y, stateDim=stateDim, aug=aug)
 A = dmd.DMD()
@@ -104,7 +106,7 @@ rospy.sleep(5)
 
 # flight with prediction
 # TODO: publish
-
+rospy.loginfo(A)
 
 
 

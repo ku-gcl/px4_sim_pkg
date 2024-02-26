@@ -6,7 +6,7 @@ class Trajectory():
     def __init__(self):
         pass
     
-    def hover(self, x=0.0, y=0.0, altitude=1.5):
+    def hover(self, time_sec, x=0.0, y=0.0, altitude=1.5):
         """
         指定された高度でホバリングするためのポイントを計算します。
         
