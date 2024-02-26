@@ -51,6 +51,10 @@ mav.arm_vehicle()
 mav.vehicle_takeoff(1.0)
 
 rospy.sleep(5)
+x, y, z = trajectory.circle(0, radius=1.0, altitude=altitude)
+mav.set_local_position(x, y, z)
+rospy.sleep(5)
+
 
 # データ格納の配列を用意
 imu_data = []
