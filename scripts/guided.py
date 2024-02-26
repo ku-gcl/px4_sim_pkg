@@ -35,7 +35,7 @@ for i in range(100):
 rospy.loginfo("Done sending setpoint ...")
 
 # GUIDEDモードに設定
-mav.set_drone_to_guided_mode()
+mav.set_drone_to_guided_mode_auto()
 
 # 機体のアーム
 mav.arm_vehicle()

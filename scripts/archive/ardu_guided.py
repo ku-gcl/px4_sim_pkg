@@ -7,9 +7,9 @@ from mavros_msgs.srv import CommandBool, SetMode, CommandTOL
 from mavros_msgs.msg import State, RCOut
 from sensor_msgs.msg import Imu
 from tf.transformations import euler_from_quaternion
-from px4_sim_pkg.command import *
-from px4_sim_pkg.function import state_cb, rcout_cb, imu_cb, pose_cb, heading_cb
-from px4_sim_pkg.function import set_heading, set_destination, quaternion_from_euler
+from scripts.archive.command import *
+from scripts.archive.function import state_cb, rcout_cb, imu_cb, pose_cb, heading_cb
+from scripts.archive.function import set_heading, set_destination, quaternion_from_euler
 
 
 

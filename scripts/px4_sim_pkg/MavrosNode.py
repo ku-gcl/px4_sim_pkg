@@ -135,9 +135,9 @@ class MavrosNode():
         self.local_pos_pub.publish(pose)
 
 
-    def set_drone_to_guided_mode(self):
+    def set_drone_to_guided_mode_auto(self):
         """
-        ドローンをGUIDEDモードに設定する関数。
+        ドローンをGUIDEDモードに自動で変更する関数。
         """
         try:
             # GUIDEDモードに設定するリクエストを送信
@@ -148,6 +148,24 @@ class MavrosNode():
                 rospy.logwarn("Guided mode not enabled, but no exception was thrown.")
         except rospy.ServiceException as e:
             rospy.logerr("Set mode failed: %s" % e)
+
+
+    def set_drone_to_guided_mode_manual(self):
+        """
+        ドローンをGUIDEDモードに手動で設定する関数。
+        """
+        while not rospy.is_shutdown():
+            if self.current_state.mode != "GUIDED":
+                try:
+                    # GUIDEDモードに設定
+                    self.set_mode_client(custom_mode="GUIDED")
+                    rospy.loginfo("Switched to GUIDED Mode")
+                except rospy.ServiceException as e:
+                    rospy.logerr("Set mode service call failed: %s" % e)
+            else:
+                rospy.loginfo("Already in GUIDED Mode")
+                break
+            rospy.sleep(0.1)
 
 
     def arm_vehicle(self):
