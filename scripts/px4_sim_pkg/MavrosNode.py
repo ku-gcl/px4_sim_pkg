@@ -17,15 +17,20 @@ class MavrosNode():
         self.current_heading = Float64()
         self.geo = GeoPointStamped()
         
-        self.state_sub = rospy.Subscriber("mavros/state", State, self.state_cb)
+        self.state_sub = rospy.Subscriber("mavros/state", State, self.state_cb)     # arming events
         self.rcout_sub = rospy.Subscriber("mavros/rc/out", RCOut, self.rcout_cb)
-        self.imu_sub = rospy.Subscriber("/mavros/imu/data", Imu, self.imu_cb)
+        self.imu_sub = rospy.Subscriber("mavros/imu/data", Imu, self.imu_cb)
         self.local_pos_pub = rospy.Publisher("mavros/setpoint_position/local", PoseStamped, queue_size=10)
         self.set_gp_origin_pub = rospy.Publisher("mavros/global_position/set_gp_origin", GeoPointStamped, queue_size=10)
         self.arming_client = rospy.ServiceProxy("mavros/cmd/arming", CommandBool)
         self.set_mode_client = rospy.ServiceProxy("mavros/set_mode", SetMode)
         self.takeoff_client = rospy.ServiceProxy("mavros/cmd/takeoff", CommandTOL)
-        self.land_client = rospy.ServiceProxy("/mavros/cmd/land", CommandTOL)
+        self.land_client = rospy.ServiceProxy("mavros/cmd/land", CommandTOL)
+        
+        self.imu.roll, self.imu.pitch, self.imu.yaw = 0.0, 0.0, 0.0
+        # self.rcou.c1, self.rcou.c2, self.rcou.c3, self.rcou.c4 = 0.0, 0.0, 0.0, 0.0
+        
+        self.rcout.thrust, self.rcout.roll, self.rcout.pitch, self.rcout.yaw = 0, 0, 0, 0
 
 
     def quaternion_from_euler(self, roll, pitch, yaw):
@@ -46,20 +51,52 @@ class MavrosNode():
     def state_cb(self, msg):
         self.current_state = msg
         # rospy.loginfo(f"Connected: {msg.connected}, Armed: {msg.armed}")
-
+        
+    def rcout_normalize(self):
+        # f = lambda c: 1/500*c-3, f(1000)
+        C = self.current_rcout
+        C1, C2, C3, C4 = C.channels[0], C.channels[1], C.channels[2], C.channels[3]
+        c1 = 1/500*C1-3
+        c2 = 1/500*C2-3
+        c3 = 1/500*C3-3
+        c4 = 1/500*C4-3
+        return c1, c2, c3, c4
+        
     def rcout_cb(self, msg):
         self.current_rcout = msg
-        # print("RC Channels 1-4: [%d, %d, %d, %d]" % (current_rcout.channels[0], current_rcout.channels[1], current_rcout.channels[2], current_rcout.channels[3]))
+        # print("RC Channels 1-4: [%d, %d, %d, %d]" % (self.current_rcout.channels[0], self.current_rcout.channels[1], self.current_rcout.channels[2], self.current_rcout.channels[3]))
+        # self.rcou.c1 = self.current_rcout.channels[0]
+        # self.rcou.c2 = self.current_rcout.channels[1]
+        # self.rcou.c3 = self.current_rcout.channels[2]
+        # self.rcou.c4 = self.current_rcout.channels[3]
+        
+        # normalize from -1 to 1
+        c1, c2, c3, c4 = self.rcout_normalize(self.current_rcout)
+        self.rcout.thrust =  (c1 + c2 + c3 + c4)/4
+        self.rcout.roll   = (-c1 + c2 + c3 - c4)/4
+        self.rcout.pitch  =  (c1 - c2 + c3 - c4)/4
+        self.rcout.yaw    =  (c1 + c2 - c3 - c4)/4
+        
+        
 
     def imu_cb(self, msg):
-        global imu_data
         orientation_q = msg.orientation
         orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
         roll, pitch, yaw = euler_from_quaternion(orientation_list)
-        # TODO: change
-        self.imu_data = [roll, pitch, yaw]
-        
         # rospy.loginfo("R: %5.2f, P: %5.2f, Y: %5.2f" % (roll, pitch, yaw))
+        
+        # 角速度
+        angvel = msg.angular_velocity
+        
+        # 姿勢角と角速度をimuに格納
+        # self.imu = []
+        self.imu.roll = roll
+        self.imu.pitch = pitch
+        self.imu.yaw = yaw
+        self.imu.angvelx = angvel.x
+        self.imu.angvely = angvel.y
+        self.imu.angvelz = angvel.z
+    
     
     def pose_cb(self, msg):
         self.current_pose = msg
@@ -68,6 +105,7 @@ class MavrosNode():
     def heading_cb(self, msg):
         self.current_heading = msg
         rospy.loginfo(f"Current heading: {msg.data}")
+    
     
     # destination
     def set_heading(self, heading, pose, GYM_OFFSET):
