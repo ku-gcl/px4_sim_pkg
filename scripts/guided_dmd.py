@@ -70,6 +70,7 @@ rate_ctrl = rospy.Rate(10)
 rospy.loginfo("Start circle trajectory")
 while (not rospy.is_shutdown() 
         and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
+    
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
     x, y, z = trajectory.circle(time_sec, radius=1.0, altitude=altitude)
@@ -125,6 +126,9 @@ rate_ctrl = rospy.Rate(10)
 rospy.loginfo("Start circle trajectory with DMD")
 while (not rospy.is_shutdown() 
         and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
+    
+    start = rospy.Time.now()
+    
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
     x, y, z = trajectory.circle(time_sec, radius=1.0, altitude=altitude)
@@ -144,6 +148,9 @@ while (not rospy.is_shutdown()
     pred_msg = Float64MultiArray()
     pred_msg.data = x_k1.flatten()  # flatten()で1次元配列に変換
     pred_state_pub.publish(pred_msg)
+
+    finish = rospy.Time.now()
+    rospy.loginfo("DMD calculation", (finish-start).to_sec())
 
     rate_ctrl.sleep()
 
