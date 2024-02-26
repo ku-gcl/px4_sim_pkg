@@ -41,14 +41,17 @@ mav.set_drone_to_guided_mode()
 mav.arm_vehicle()
 
 # 離陸
-mav.vehicle_takeoff(1.5)
+mav.vehicle_takeoff(1.0)
 
 rospy.sleep(5)
 
 
 # メインループ
 start_time = rospy.Time.now()
-while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(10.0):
+duration = 10.0
+rospy.loginfo("Start circle trajectory")
+while (not rospy.is_shutdown() 
+        and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
     x, y, z = trajectory.circle(time_sec, radius=1.0, altitude=altitude)
