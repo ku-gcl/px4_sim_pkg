@@ -55,8 +55,8 @@ include_directories(
 # target_link_libraries(offboard_sample ${catkin_LIBRARIES})
 
 # C++スクリプトをインストールするための設定
-# add_executable(ardu_guided src/ardu_guided.cpp)
-# target_link_libraries(ardu_guided ${catkin_LIBRARIES})
+add_executable(ardu_guided src/ardu_guided.cpp)
+target_link_libraries(ardu_guided ${catkin_LIBRARIES})
 
 # Pythonスクリプトをインストールするための設定
 catkin_install_python(PROGRAMS
