@@ -52,7 +52,7 @@ mav.arm_vehicle()
 mav.vehicle_takeoff(altitude)
 
 rospy.sleep(5)
-x, y, z = trajectory.circle(0, radius=1.0, altitude=altitude)
+x, y, z = trajectory.circle(0, radius=radius, altitude=altitude)
 mav.set_local_position(x, y, z)
 rospy.sleep(5)
 
@@ -74,7 +74,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circle(time_sec, radius=1.0, altitude=altitude)
+    x, y, z = trajectory.circle(time_sec, radius=radius, altitude=altitude)
     mav.set_local_position(x, y, z)
     
     # data collecting
@@ -132,7 +132,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circle(time_sec, radius=1.0, altitude=altitude)
+    x, y, z = trajectory.circle(time_sec, radius=radius, altitude=altitude)
     mav.set_local_position(x, y, z)
     
     # mav.imu, mav.rcout_norm, mav.force_and_torqueをNumPy配列に変換
