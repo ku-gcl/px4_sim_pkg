@@ -31,7 +31,8 @@ latitude = 33.595270
 longitude = 130.215496
 mav.set_gp_position(latitude, longitude)
 
-altitude = 1.0
+altitude = 0.5
+radius = 0.5
 
 # セットポイントを送信
 rospy.loginfo("Sending setpoint ...")
