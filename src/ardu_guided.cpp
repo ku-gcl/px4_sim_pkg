@@ -36,11 +36,11 @@ double LOOP_RATE = 0.1;
 
 // 飛行モードを選択
 // Select flight MODE: circle, updown, eight, hovering
-string MODE = "circle";
+// string MODE = "circle";
 // string MODE = "updown";
 // string MODE = "rightleft";
 // string MODE = "eight";
-// string MODE = "hovering";
+string MODE = "hovering";
 
 // get armed state
 void state_cb(const mavros_msgs::State::ConstPtr &msg)
