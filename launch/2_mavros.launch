@@ -29,6 +29,6 @@
 		<arg name="respawn_mavros" value="$(arg respawn_mavros)" />
 	</include>
     <!-- Set MAVROS message rate to 10 Hz -->
-    <!-- <node name="set_mavros_rate" pkg="mavros" type="mavsys" args="rate --all 10" output="screen"/>
-    <node name="set_mavros_extra1_rate" pkg="mavros" type="mavsys" args="rate --extra1 10" output="screen"/> -->
+    <node name="set_mavros_rate" pkg="mavros" type="mavsys" args="rate --all 10" output="screen"/>
+    <node name="set_mavros_extra1_rate" pkg="mavros" type="mavsys" args="rate --extra1 10" output="screen"/>
 </launch>
