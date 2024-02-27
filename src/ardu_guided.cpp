@@ -304,7 +304,7 @@ int main(int argc, char **argv)
             }
             else if (MODE == "hovering")
             {
-                setDestination(0, 1.0, HEIGHT);
+                setDestination(0, 0, HEIGHT);
             }
             else
             {
