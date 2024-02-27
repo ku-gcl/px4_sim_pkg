@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 
     // request takeoff
     mavros_msgs::CommandTOL srv_takeoff;
-    srv_takeoff.request.altitude = 1.5;
+    srv_takeoff.request.altitude = 0.5;
     if (takeoff_client.call(srv_takeoff))
     {
         ROS_INFO("takeoff sent %d", srv_takeoff.response.success);
@@ -226,8 +226,8 @@ int main(int argc, char **argv)
     {
         ROS_INFO("CIRCLE");
         omega = 0.6;
-        HEIGHT = 1.0;
-        // HEIGHT = 0.5;
+        // HEIGHT = 1.0;
+        HEIGHT = 0.5;
         // HEIGHT = 0.3;
         setDestination(1.0, 0, HEIGHT);
     }
