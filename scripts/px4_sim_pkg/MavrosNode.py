@@ -108,7 +108,6 @@ class MavrosNode():
         self.geo.position.latitude = latitude
         self.geo.position.longitude = longitude
         self.set_gp_origin_pub.publish(self.geo)
-        rospy.loginfo("Done Global Position ...")
 
     def set_destination(self, x, y, z, GYM_OFFSET):
         deg2rad = math.pi / 180

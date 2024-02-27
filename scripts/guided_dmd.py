@@ -29,7 +29,10 @@ rospy.loginfo("Waiting for connection...")
 rospy.loginfo("Set Global Position ...")
 latitude = 33.595270
 longitude = 130.215496
-mav.set_gp_position(latitude, longitude)
+for i in range(100):
+    mav.set_gp_position(latitude, longitude)
+    rate.sleep()
+rospy.loginfo("Done Global Position ...")
 
 altitude = 0.5
 radius = 0.5
