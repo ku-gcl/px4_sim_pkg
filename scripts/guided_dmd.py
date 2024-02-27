@@ -153,8 +153,8 @@ while (not rospy.is_shutdown()
     pred_msg.data = x_k1.flatten()  # flatten()で1次元配列に変換
     pred_state_pub.publish(pred_msg)
 
-    finish = rospy.Time.now()
-    rospy.loginfo("DMD calculation", (finish-start).to_sec())
+    # finish = rospy.Time.now()
+    # rospy.loginfo("DMD calculation", (finish-start).to_sec())
 
     rate_ctrl.sleep()
 
