@@ -36,11 +36,11 @@ double LOOP_RATE = 0.1;
 
 // 飛行モードを選択
 // Select flight MODE: circle, updown, eight, hovering
-string MODE = "circle";
+// string MODE = "circle";
 // string MODE = "updown";
 // string MODE = "rightleft";
 // string MODE = "eight";
-// string MODE = "hovering";
+string MODE = "hovering";
 
 // get armed state
 void state_cb(const mavros_msgs::State::ConstPtr &msg)
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 
     // request takeoff
     mavros_msgs::CommandTOL srv_takeoff;
-    srv_takeoff.request.altitude = 1.5;
+    srv_takeoff.request.altitude = 0.5;
     if (takeoff_client.call(srv_takeoff))
     {
         ROS_INFO("takeoff sent %d", srv_takeoff.response.success);
@@ -226,8 +226,8 @@ int main(int argc, char **argv)
     {
         ROS_INFO("CIRCLE");
         omega = 0.6;
-        HEIGHT = 1.5;
-        // HEIGHT = 0.5;
+        // HEIGHT = 1.0;
+        HEIGHT = 0.5;
         // HEIGHT = 0.3;
         setDestination(1.0, 0, HEIGHT);
     }
@@ -304,7 +304,7 @@ int main(int argc, char **argv)
             }
             else if (MODE == "hovering")
             {
-                setDestination(0, 1.0, HEIGHT);
+                setDestination(0, 0, HEIGHT);
             }
             else
             {

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Step3: Launching MoCap: mocap.launch -->
+    <!-- Pass in mocap_config_file:=/path/to/config.yaml to change options. -->
+    <arg name="mocap_config_file"
+        default="$(find px4_sim_pkg)/config/mocap.yaml" />
+    <node pkg="mocap_optitrack"
+            type="mocap_node"
+            name="mocap_node"
+            respawn="false"
+            launch-prefix=""
+            required="true">
+        <rosparam file="$(arg mocap_config_file)" command="load" />
+    </node>
+    <!-- Relay MoCap data -->
+    <node name="mavros_relay_mocap" pkg="topic_tools" type="relay" args="/mocap_node/Robot_1/pose /mavros/vision_pose/pose" output="screen"/>
+</launch>

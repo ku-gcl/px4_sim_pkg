@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="fcu_url" default="/dev/ttyS0:921600" />
+	<arg name="gcs_url" default="udp://:14550@192.168.0.173:14557" />
+
+	<!-- for SITL -->
+	<!-- <arg name="fcu_url" default="udp://127.0.0.1:14550@14555" />
+	<arg name="gcs_url" default="" /> -->
+	<arg name="tgt_system" default="1" />
+	<arg name="tgt_component" default="1" />
+	<arg name="log_output" default="screen" />
+	<arg name="fcu_protocol" default="v2.0" />
+	<arg name="respawn_mavros" default="false" />
+
+
+    <!-- Step2: Launch MAVROS -->
+	<include file="$(find mavros)/launch/node.launch">
+		<arg name="pluginlists_yaml" value="$(find mavros)/launch/apm_pluginlists.yaml" />
+		<arg name="config_yaml" value="$(find mavros)/launch/apm_config.yaml" />
+
+		<arg name="fcu_url" value="$(arg fcu_url)" />
+		<arg name="gcs_url" value="$(arg gcs_url)" />
+		<arg name="tgt_system" value="$(arg tgt_system)" />
+		<arg name="tgt_component" value="$(arg tgt_component)" />
+		<arg name="log_output" value="$(arg log_output)" />
+		<arg name="fcu_protocol" value="$(arg fcu_protocol)" />
+		<arg name="respawn_mavros" value="$(arg respawn_mavros)" />
+	</include>
+    <!-- Set MAVROS message rate to 10 Hz -->
+    <node name="set_mavros_rate" pkg="mavros" type="mavsys" args="rate --all 10" output="screen"/>
+    <node name="set_mavros_extra1_rate" pkg="mavros" type="mavsys" args="rate --extra1 10" output="screen"/>
+</launch>

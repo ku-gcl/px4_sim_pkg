@@ -11,8 +11,8 @@ from sensor_msgs.msg import Imu
 from tf.transformations import euler_from_quaternion
 
 # グローバル変数の定義
-current_state = State()
-current_rcout = RCOut()
+# current_state = State()
+# current_rcout = RCOut()
 
 def state_cb(msg):
     global current_state
@@ -29,7 +29,7 @@ def imu_cb(msg):
     orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
     roll, pitch, yaw = euler_from_quaternion(orientation_list)
     # rospy.loginfo("Roll: %f, Pitch: %f, Yaw: %f" % (roll, pitch, yaw))
-    rospy.loginfo("R: %5.2f, P: %5.2f, Y: %5.2f" % (roll, pitch, yaw))
+    # rospy.loginfo("R: %5.2f, P: %5.2f, Y: %5.2f" % (roll, pitch, yaw))
 
 def main():
     rospy.init_node('offb_node', anonymous=True)
@@ -45,16 +45,23 @@ def main():
 
     rate = rospy.Rate(20.0)  # MUST be > 2Hz
 
+    rospy.loginfo("Initializing ...")
     # FCU接続を待つ
     while not rospy.is_shutdown() and not current_state.connected:
-        rospy.spin()
-        rate.sleep()
+        # rospy.spin()
+        # rate.sleep()
+        rospy.sleep(0.01)
+        rospy.loginfo("Loop for waiting for connection...")
+
+    rospy.loginfo("Waiting for connection...")
 
     # グローバルポジションの原点を設定
+    rospy.loginfo("Set Global Position ...")
     geo = GeoPointStamped()
     geo.position.latitude = 33.595270
     geo.position.longitude = 130.215496
     set_gp_origin_pub.publish(geo)
+    rospy.loginfo("Done Global Position ...")
 
     pose = PoseStamped()
     pose.pose.position.x = 1
@@ -62,10 +69,12 @@ def main():
     pose.pose.position.z = 1.5
 
     # セットポイントを送信
+    rospy.loginfo("Sending setpoint ...")
     for i in range(100):
         local_pos_pub.publish(pose)
-        rospy.spin()
+        # rospy.spin()
         rate.sleep()
+    rospy.loginfo("Done sending setpoint ...")
 
     # GUIDEDモードに設定
     try:
@@ -100,7 +109,7 @@ def main():
 
         local_pos_pub.publish(pose)
 
-        rospy.spin()
+        # rospy.spin()
         rospy.sleep(0.1)
 
     # 着陸
