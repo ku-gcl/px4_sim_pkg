@@ -88,6 +88,75 @@ while (not rospy.is_shutdown()
     # rospy.sleep(0.1)
 
 
+# TODO: CSV出力
+
+
+# hovering for calculation
+rospy.loginfo("Hover for DMD calculation")
+rospy.sleep(2.0)
+x, y, z = trajectory.hover(time_sec, x=0, y=0, altitude=altitude)
+mav.set_local_position(x, y, z)
+rospy.sleep(2.0)
+
+
+# preprocessing and DMD implementation
+rospy.loginfo("DMD calculation start")
+# TODO: add data preprocessing
+
+# list to nparray
+y = np.array(imu_data).T
+u = np.array(force_and_torque).T
+u = u[1:4, :]      # extract torque only
+stateDim, _ = y.shape
+inputDim, _ = u.shape
+aug = 1 
+
+dmd = DMD.DMD()
+Y = dmd.concatenate(y, u)
+dmd.splitdata(XX=Y, stateDim=stateDim, aug=aug)
+A = dmd.DMD()
+rospy.loginfo("DMD calculation end")
+rospy.sleep(5)
+
+rospy.loginfo(A)
+
+
+# flight with prediction
+start_time = rospy.Time.now()
+duration = 60.0
+rate_ctrl = rospy.Rate(10)
+
+rospy.loginfo("Start circle trajectory with DMD")
+while (not rospy.is_shutdown() 
+        and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
+    
+    start = rospy.Time.now()
+    
+    time_sec = (rospy.Time.now() - start_time).to_sec()
+
+    x, y, z = trajectory.hover(time_sec, x=0, y=0, altitude=altitude)
+    mav.set_local_position(x, y, z)
+    
+    # mav.imu, mav.rcout_norm, mav.force_and_torqueをNumPy配列に変換
+    imu_np = np.array(mav.imu)
+    force_and_torque_np = np.array(mav.force_and_torque)[1:4]  # [1:4]で特定の要素を抽出
+    
+    # これらを1行のベクトルに変換
+    data_vector = np.concatenate([imu_np, force_and_torque_np])
+
+    # DMDによる状態予測
+    x_k1 = dmd.predictstate(data_vector)  # reshape(-1, 1)で2次元配列に変換
+
+    # 予測された状態x_k1を/dmd/predict_stateとしてpublish
+    pred_msg = Float64MultiArray()
+    pred_msg.data = x_k1.flatten()  # flatten()で1次元配列に変換
+    pred_state_pub.publish(pred_msg)
+
+    # finish = rospy.Time.now()
+    # rospy.loginfo("DMD calculation", (finish-start).to_sec())
+
+    rate_ctrl.sleep()
+
 
 # 着陸
 rospy.loginfo("Sending setpoint ...")
