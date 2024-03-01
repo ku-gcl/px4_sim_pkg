@@ -7,3 +7,4 @@
 *.vscode
 *.pyc
 */__pychache__
+.DS_Store
