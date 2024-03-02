@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+
+# mocap_optitrackのデータ(FLU)からlocal座標系(ENU)に変換した座標を
+# /mavros/vision_pose/poseにpublishするコード
+# 起動はexperiment.launchで行う
+
 import rospy
 from geometry_msgs.msg import PoseStamped
 
