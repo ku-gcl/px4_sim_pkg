@@ -61,6 +61,7 @@ target_link_libraries(ardu_guided ${catkin_LIBRARIES})
 # Pythonスクリプトをインストールするための設定
 catkin_install_python(PROGRAMS
   # scripts/archive/ardu_guided.py
+  scripts/pose_transformer.py
   scripts/guided.py
   scripts/guided_dmd.py
   scripts/guided_hover.py
