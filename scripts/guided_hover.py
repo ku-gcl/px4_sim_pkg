@@ -68,7 +68,7 @@ force_and_torque = []
 # メインループ
 start_time = rospy.Time.now()
 duration = 10.0
-rate_ctrl = rospy.Rate(10)
+rate_ctrl = rospy.Rate(20)
 
 rospy.loginfo("Start circle trajectory")
 while (not rospy.is_shutdown() 
