@@ -5,7 +5,9 @@
 timestamp=$(date +"%Y-%m-%d-%H-%M-%S")
 filename="experiment_$timestamp.bag"
 
-dir=~/rosbag
+folder=$(date +"%Y-%m-%d")
+
+dir=~/rosbag/$folder
 mkdir -p $dir
 
 cd $dir
