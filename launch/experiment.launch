@@ -49,7 +49,8 @@
         <rosparam file="$(arg mocap_config_file)" command="load" />
     </node>
     <!-- Relay MoCap data to /mavros/vision_pose/pose -->
-    <node name="pose_transformer_node" pkg="px4_sim_pkg" type="pose_transformer.py" output="screen"/>
+    <!-- <node name="pose_transformer_node" pkg="px4_sim_pkg" type="pose_transformer.py" output="screen"/> -->
+    <node name="pose_transformer" pkg="px4_sim_pkg" type="pose_transformer" output="screen" />
 
 
     <!-- Step4: Execute custom ROS node -->

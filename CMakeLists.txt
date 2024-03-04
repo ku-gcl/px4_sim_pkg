@@ -58,6 +58,9 @@ include_directories(
 add_executable(ardu_guided src/ardu_guided.cpp)
 target_link_libraries(ardu_guided ${catkin_LIBRARIES})
 
+add_executable(pose_transformer src/pose_transformer.cpp)
+target_link_libraries(pose_transformer ${catkin_LIBRARIES})
+
 # Pythonスクリプトをインストールするための設定
 catkin_install_python(PROGRAMS
   # scripts/archive/ardu_guided.py
