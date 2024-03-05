@@ -68,5 +68,6 @@ catkin_install_python(PROGRAMS
   scripts/guided.py
   scripts/guided_dmd.py
   scripts/guided_hover.py
+  scripts/guided_hover_test.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
