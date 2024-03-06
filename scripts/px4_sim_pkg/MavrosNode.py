@@ -2,6 +2,7 @@ import rospy
 import math
 from std_msgs.msg import Float64
 from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import Quaternion
 from geographic_msgs.msg import GeoPointStamped
 from mavros_msgs.srv import CommandBool, SetMode, CommandTOL
 from mavros_msgs.msg import State, RCOut
@@ -17,6 +18,11 @@ class MavrosNode():
         self.current_heading = Float64()
         self.geo = GeoPointStamped()
         self.pose = PoseStamped()
+        self.pose = PoseStamped()
+        self.pose.pose.position.x = 0
+        self.pose.pose.position.y = 0
+        self.pose.pose.position.z = 0
+        self.pose.pose.orientation = Quaternion(0, 0, 0, 1)  # A default neutral orientation
         
         self.state_sub = rospy.Subscriber("mavros/state", State, self.state_cb)     # arming events
         self.rcout_sub = rospy.Subscriber("mavros/rc/out", RCOut, self.rcout_cb)
