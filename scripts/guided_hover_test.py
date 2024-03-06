@@ -34,7 +34,7 @@ for i in range(100):
     rate.sleep()
 rospy.loginfo("Done Global Position ...")
 
-altitude = 0.5
+altitude = 1.0
 
 # セットポイントを送信
 rospy.loginfo("Sending setpoint ...")
@@ -53,10 +53,10 @@ mav.arm_vehicle()
 # 離陸
 mav.vehicle_takeoff(altitude)
 
-rospy.sleep(3)
+rospy.sleep(5)
 x, y, z = trajectory.hover(0, x=0, y=0, altitude=altitude)
 mav.set_local_position(x, y, z)
-rospy.sleep(3)
+rospy.sleep(60)
 
 
 
