@@ -143,6 +143,7 @@ class MavrosNode():
         self.pose.pose.position.z = z
     
     def pub_local_position(self):
+        rospy.loginfo(self.pose)
         self.local_pos_pub.publish(self.pose)
 
 
