@@ -53,5 +53,5 @@
 
 
     <!-- Step4: Execute custom ROS node -->
-    <node name="ardu_guided_node" pkg="px4_sim_pkg" type="ardu_guided" output="screen"/>
+    <!-- <node name="ardu_guided_node" pkg="px4_sim_pkg" type="ardu_guided" output="screen"/> -->
 </launch>
