@@ -10,6 +10,7 @@ rospy.init_node('offb_node', anonymous=True)
 mavros_node = MavrosNode.MavrosNode()
 rate = rospy.Rate(10.0)    
 MODE = "hovering"  # 飛行モードの選択: circle, updown, eight, hovering
+HEIGHT = 0.5
 
 # FCUの接続を待つ
 rospy.loginfo("Waiting for connection...")
