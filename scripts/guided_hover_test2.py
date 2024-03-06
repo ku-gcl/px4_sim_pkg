@@ -1,7 +1,7 @@
 import rospy
 import px4_sim_pkg.MavrosNode as MavrosNode
 from std_msgs.msg import Float64
-from geometry_msgs.msg import PoseStamped, Quaternion
+from geometry_msgs.msg import PoseStamped
 from geographic_msgs.msg import GeoPointStamped
 
 

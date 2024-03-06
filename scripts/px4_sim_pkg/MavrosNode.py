@@ -1,7 +1,7 @@
 import rospy
 import math
 from std_msgs.msg import Float64
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Quaternion
 from geographic_msgs.msg import GeoPointStamped
 from mavros_msgs.srv import CommandBool, SetMode, CommandTOL
 from mavros_msgs.msg import State, RCOut
