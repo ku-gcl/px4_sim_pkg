@@ -54,7 +54,7 @@ class MavrosNode():
         qy = cy * cr * sp + sy * sr * cp
         qz = sy * cr * cp - cy * sr * sp
 
-        # return {'w': qw, 'x': qx, 'y': qy, 'z': qz}
+        return {'w': qw, 'x': qx, 'y': qy, 'z': qz}
     
     def state_cb(self, msg):
         self.current_state = msg
@@ -126,7 +126,9 @@ class MavrosNode():
     def set_heading(self, heading):
         heading = -heading + 90 - self.GYM_OFFSET
         yaw = math.radians(heading)
-        self.pose.pose.orientation = self.quaternion_from_euler(0, 0, yaw)
+        quat = self.quaternion_from_euler(0, 0, yaw)
+        # Convert the dictionary to a Quaternion object
+        self.pose.pose.orientation = Quaternion(x=quat['x'], y=quat['y'], z=quat['z'], w=quat['w'])
 
     def set_destination(self, x, y, z):
         deg2rad = math.pi / 180
@@ -149,7 +151,8 @@ class MavrosNode():
         self.pose.pose.position.z = z
     
     def pub_local_position(self):
-        rospy.loginfo(self.pose)
+        # Set the current ROS time as the timestamp in the header
+        self.pose.header.stamp = rospy.Time.now()
         self.local_pos_pub.publish(self.pose)
 
 
@@ -226,3 +229,8 @@ class MavrosNode():
         except rospy.ServiceException as e:
             rospy.logerr("Landing failed: %s" % e)
 
+# if __name__ == "__main__":
+#     rospy.init_node('offb_node', anonymous=True)
+#     mav = MavrosNode()
+#     mav.set_heading(0)
+#     mav.set_heading(90)
