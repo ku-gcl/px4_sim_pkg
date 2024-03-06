@@ -98,7 +98,7 @@ class MavrosNode():
 
     def heading_cb(self, msg):
         self.current_heading = msg
-        rospy.loginfo(f"Current heading: {msg.data}")
+        # rospy.loginfo(f"Current heading: {msg.data}")
     
     
     def set_gym_offset(self):
