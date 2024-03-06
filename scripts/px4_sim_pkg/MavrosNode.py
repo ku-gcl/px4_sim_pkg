@@ -16,6 +16,7 @@ class MavrosNode():
         self.current_pose = PoseStamped()
         self.current_heading = Float64()
         self.geo = GeoPointStamped()
+        self.pose = PoseStamped()
         
         self.state_sub = rospy.Subscriber("mavros/state", State, self.state_cb)     # arming events
         self.rcout_sub = rospy.Subscriber("mavros/rc/out", RCOut, self.rcout_cb)
@@ -31,6 +32,7 @@ class MavrosNode():
         self.rcout = [0, 0, 0, 0]
         self.rcout_norm = [0, 0, 0, 0]
         self.force_and_torque = [0, 0, 0, 0]
+        self.GYM_OFFSET = 0
 
 
     def quaternion_from_euler(self, roll, pitch, yaw):
@@ -97,29 +99,38 @@ class MavrosNode():
         rospy.loginfo(f"Current heading: {msg.data}")
     
     
-    # destination
-    def set_heading(self, heading, pose, GYM_OFFSET):
-        heading = -heading + 90 - GYM_OFFSET
-        yaw = math.radians(heading)
-        pose.pose.orientation = self.quaternion_from_euler(0, 0, yaw)
-        return pose
+    def set_gym_offset(self):
+        rate = rospy.Rate(10.0)
+        total_heading = 0
+        for i in range(1, 31):
+            rate.sleep()  # 0.1秒待機
+            total_heading += self.current_heading.data
+            rospy.loginfo("current heading%d: %f", i, total_heading / i)
+        self.GYM_OFFSET = total_heading / 30
+        rospy.loginfo(f"the N' axis is facing: {self.GYM_OFFSET}")
+    
     
     def set_gp_position(self, latitude, longitude):
         self.geo.position.latitude = latitude
         self.geo.position.longitude = longitude
         self.set_gp_origin_pub.publish(self.geo)
+    
+    
+    # destination
+    def set_heading(self, heading):
+        heading = -heading + 90 - self.GYM_OFFSET
+        yaw = math.radians(heading)
+        self.pose.pose.orientation = self.quaternion_from_euler(0, 0, yaw)
 
-    def set_destination(self, x, y, z, GYM_OFFSET):
+    def set_destination(self, x, y, z):
         deg2rad = math.pi / 180
-        X = x * math.cos(-GYM_OFFSET * deg2rad) - y * math.sin(-GYM_OFFSET * deg2rad)
-        Y = x * math.sin(-GYM_OFFSET * deg2rad) + y * math.cos(-GYM_OFFSET * deg2rad)
+        X = x * math.cos(-self.GYM_OFFSET * deg2rad) - y * math.sin(-self.GYM_OFFSET * deg2rad)
+        Y = x * math.sin(-self.GYM_OFFSET * deg2rad) + y * math.cos(-self.GYM_OFFSET * deg2rad)
         Z = z
-        pose = PoseStamped()
-        pose.pose.position.x = X
-        pose.pose.position.y = Y
-        pose.pose.position.z = Z
+        self.pose.pose.position.x = X
+        self.pose.pose.position.y = Y
+        self.pose.pose.position.z = Z
         rospy.loginfo(f"Destination set to x: {X}, y: {Y}, z: {Z}")
-        return pose
     
     
     def set_local_position(self, x, y, z):
@@ -127,11 +138,12 @@ class MavrosNode():
         ローカル座標で指定された位置にドローンを移動させる
         """
 
-        pose = PoseStamped()
-        pose.pose.position.x = x
-        pose.pose.position.y = y
-        pose.pose.position.z = z
-        self.local_pos_pub.publish(pose)
+        self.pose.pose.position.x = x
+        self.pose.pose.position.y = y
+        self.pose.pose.position.z = z
+    
+    def pub_local_position(self):
+        self.local_pos_pub.publish(self.pose)
 
 
     def set_drone_to_guided_mode_auto(self):
@@ -208,55 +220,55 @@ class MavrosNode():
             rospy.logerr("Landing failed: %s" % e)
 
 
-if __name__ == '__main__':
-    rospy.init_node('offb_node', anonymous=True)
+# if __name__ == '__main__':
+#     rospy.init_node('offb_node', anonymous=True)
 
-    rate = rospy.Rate(20.0)
-    mav = MavrosNode()
-    rospy.loginfo("Initializing ...")
-    # FCU接続を待つ
-    while not rospy.is_shutdown() and not mav.current_state.connected:
-        rospy.loginfo("current_state.connected: %s" % (mav.current_state.connected))
-        rospy.sleep(0.1)
+#     rate = rospy.Rate(20.0)
+#     mav = MavrosNode()
+#     rospy.loginfo("Initializing ...")
+#     # FCU接続を待つ
+#     while not rospy.is_shutdown() and not mav.current_state.connected:
+#         rospy.loginfo("current_state.connected: %s" % (mav.current_state.connected))
+#         rospy.sleep(0.1)
         
-    rospy.loginfo("Waiting for connection...")
+#     rospy.loginfo("Waiting for connection...")
 
-    # グローバルポジションの原点を設定
-    rospy.loginfo("Set Global Position ...")
-    latitude = 33.595270
-    longitude = 130.215496
-    mav.set_gp_position(latitude, longitude)
-
-
-    # セットポイントを送信
-    rospy.loginfo("Sending setpoint ...")
-    for i in range(100):
-        mav.set_local_position(1, 0, 1.5)
-        rate.sleep()
-    rospy.loginfo("Done sending setpoint ...")
-
-    # GUIDEDモードに設定
-    mav.set_drone_to_guided_mode()
-
-    # 機体のアーム
-    mav.arm_vehicle()
-
-    # 離陸
-    mav.vehicle_takeoff(1.5)
-
-    rospy.sleep(5)
+#     # グローバルポジションの原点を設定
+#     rospy.loginfo("Set Global Position ...")
+#     latitude = 33.595270
+#     longitude = 130.215496
+#     mav.set_gp_position(latitude, longitude)
 
 
-    # メインループ
-    start_time = rospy.Time.now()
-    while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(120.0):
-        time_sec = (rospy.Time.now() - start_time).to_sec()
-        x = 1.0 * math.cos(time_sec)
-        y = 1.0 * math.sin(time_sec)
-        z = 1.5
-        mav.set_local_position(x, y, z)
-        rospy.sleep(0.1)
+#     # セットポイントを送信
+#     rospy.loginfo("Sending setpoint ...")
+#     for i in range(100):
+#         mav.set_local_position(1, 0, 1.5)
+#         rate.sleep()
+#     rospy.loginfo("Done sending setpoint ...")
 
-    # 着陸
-    mav.send_land_command()
+#     # GUIDEDモードに設定
+#     mav.set_drone_to_guided_mode()
+
+#     # 機体のアーム
+#     mav.arm_vehicle()
+
+#     # 離陸
+#     mav.vehicle_takeoff(1.5)
+
+#     rospy.sleep(5)
+
+
+#     # メインループ
+#     start_time = rospy.Time.now()
+#     while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(120.0):
+#         time_sec = (rospy.Time.now() - start_time).to_sec()
+#         x = 1.0 * math.cos(time_sec)
+#         y = 1.0 * math.sin(time_sec)
+#         z = 1.5
+#         mav.set_local_position(x, y, z)
+#         rospy.sleep(0.1)
+
+#     # 着陸
+#     mav.send_land_command()
 

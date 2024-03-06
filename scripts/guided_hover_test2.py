@@ -14,35 +14,27 @@ def main():
     # FCUの接続を待つ
     while not mavros_node.current_state.connected:
         rospy.sleep(0.1)
-        
+    
     rospy.loginfo("Waiting for connection...")
 
     # グローバルポジションの原点を設定
     rospy.loginfo("Set Global Position ...")
-    latitude = 33.595270
-    longitude = 130.215496
-    for i in range(100):
-        mavros_node.set_gp_position(latitude, longitude)
+    for i in range(10):
+        mavros_node.set_gp_position(latitude=33.595270, longitude=130.215496)
         rate.sleep()
     rospy.loginfo("Done Global Position ...")
 
     # GYM_OFFSETの計算
     rospy.sleep(3)  # 現在のheadingを取得するための時間
-    GYM_OFFSET = 0
-    total_heading = 0
-    for i in range(1, 31):
-        rate.sleep()  # 0.1秒待機
-        total_heading += mavros_node.current_heading.data
-        rospy.loginfo("current heading%d: %f", i, total_heading / i)
-    GYM_OFFSET = total_heading / 30
-    rospy.loginfo(f"the N' axis is facing: {GYM_OFFSET}")
+    mavros_node.set_gym_offset()
 
     # 開始地点をlocal座標で設定
-    start_pose = mavros_node.set_destination(0, 0, 0.5, GYM_OFFSET)
-    mavros_node.set_local_position(start_pose.pose.position.x, start_pose.pose.position.y, start_pose.pose.position.z)
+    mavros_node.set_destination(x=0, y=0, z=0.5)
+    mavros_node.pub_local_position()
 
     # GUIDEDモードに変更
-    mavros_node.set_drone_to_guided_mode_auto()
+    mavros_node.set_drone_to_guided_mode_manual()
+    # mavros_node.set_drone_to_guided_mode_auto()
 
     # 機体をアーム
     mavros_node.arm_vehicle()
@@ -54,13 +46,19 @@ def main():
     mavros_node.set_heading(0)
 
     # 特定の期間ホバリングを実行
-    while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(10.0):
-        rate.sleep()  # 0.1秒ごとにループ
+    start_time = rospy.Time.now()
+    duration = 20.0
+    rate_ctrl = rospy.Rate(20)
+    HEIGHT = 0.5
+    
+    rospy.loginfo("HOVERING")
+    while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(duration):
         if MODE == "hovering":
-            rospy.loginfo("HOVERING")
-            HEIGHT = 0.5
-            hovering_pose = mavros_node.set_destination(0, 0, HEIGHT, GYM_OFFSET)
-            mavros_node.set_local_position(hovering_pose.pose.position.x, hovering_pose.pose.position.y, hovering_pose.pose.position.z)
+            mavros_node.set_destination(x=0, y=0, z=HEIGHT)
+            # mavros_node.set_local_position(x=0, y=0, z=HEIGHT)
+            mavros_node.pub_local_position()
+            
+        rate_ctrl.sleep()  # 0.1秒ごとにループ
     rospy.loginfo("end hovering")
 
     # 着陸
