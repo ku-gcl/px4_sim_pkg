@@ -31,7 +31,8 @@ rospy.sleep(3)  # 現在のheadingを取得するための時間
 mavros_node.set_gym_offset()
 
 # 開始地点をlocal座標で設定
-mavros_node.set_destination(x=0, y=0, z=0.5)
+# mavros_node.set_destination(x=0, y=0, z=0.5)
+mavros_node.set_local_position(x=0, y=0, z=HEIGHT)
 mavros_node.pub_local_position()
 
 # GUIDEDモードに変更
@@ -49,15 +50,15 @@ mavros_node.set_heading(0)
 
 # 特定の期間ホバリングを実行
 start_time = rospy.Time.now()
-duration = 20.0
+duration = 60.0
 rate_ctrl = rospy.Rate(20)
 HEIGHT = 0.5
 
 rospy.loginfo("HOVERING")
 while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(duration):
     if MODE == "hovering":
-        mavros_node.set_destination(x=0, y=0, z=HEIGHT)
-        # mavros_node.set_local_position(x=0, y=0, z=HEIGHT)
+        # mavros_node.set_destination(x=0, y=0, z=HEIGHT)
+        mavros_node.set_local_position(x=0, y=0, z=HEIGHT)
         mavros_node.pub_local_position()
         
     rate_ctrl.sleep()  # 0.1秒ごとにループ
