@@ -21,6 +21,8 @@ class MavrosNode():
         self.state_sub = rospy.Subscriber("mavros/state", State, self.state_cb)     # arming events
         self.rcout_sub = rospy.Subscriber("mavros/rc/out", RCOut, self.rcout_cb)
         self.imu_sub = rospy.Subscriber("mavros/imu/data", Imu, self.imu_cb)
+        self.heading_sub = rospy.Subscriber("mavros/global_position/compass_hdg", Float64, self.heading_cb)
+        
         self.local_pos_pub = rospy.Publisher("mavros/setpoint_position/local", PoseStamped, queue_size=10)
         self.set_gp_origin_pub = rospy.Publisher("mavros/global_position/set_gp_origin", GeoPointStamped, queue_size=10)
         self.arming_client = rospy.ServiceProxy("mavros/cmd/arming", CommandBool)

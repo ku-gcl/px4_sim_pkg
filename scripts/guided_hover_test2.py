@@ -12,10 +12,12 @@ rate = rospy.Rate(10.0)
 MODE = "hovering"  # 飛行モードの選択: circle, updown, eight, hovering
 
 # FCUの接続を待つ
+rospy.loginfo("Waiting for connection...")
 while not mavros_node.current_state.connected:
     rospy.sleep(0.1)
 
-rospy.loginfo("Waiting for connection...")
+# allow the subscribers to initialize
+rospy.sleep(5)
 
 # グローバルポジションの原点を設定
 rospy.loginfo("Set Global Position ...")
