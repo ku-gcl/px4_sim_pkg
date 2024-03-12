@@ -33,7 +33,7 @@ mav.set_gym_offset()
 
 # 開始地点をlocal座標で設定
 # mavros_node.set_destination(x=0, y=0, z=0.5)
-mav.set_local_position(x=1, y=0, z=HEIGHT)
+mav.set_local_position(x=1, y=1, z=HEIGHT)
 mav.pub_local_position()
 
 # GUIDEDモードに変更
@@ -59,7 +59,7 @@ rospy.loginfo("HOVERING")
 while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(duration):
     if MODE == "hovering":
         # mavros_node.set_destination(x=0, y=0, z=HEIGHT)
-        mav.set_local_position(x=1, y=0, z=HEIGHT)
+        mav.set_local_position(x=1, y=1, z=HEIGHT)
         mav.pub_local_position()        
     rate_ctrl.sleep()  # 0.1秒ごとにループ
 rospy.loginfo("end hovering")
