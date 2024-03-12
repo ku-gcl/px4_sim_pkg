@@ -60,6 +60,7 @@ rospy.loginfo("Circle")
 while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(duration):
     time_sec = (rospy.Time.now() - start_time).to_sec()
     x, y, z = trajectory.circle(time_sec=time_sec, radius=radius, altitude=altitude)
+    # mav.set_heading(0)
     mav.set_destination(x, y, z)
     mav.pub_local_position()        
     rate_ctrl.sleep()  # 0.1秒ごとにループ

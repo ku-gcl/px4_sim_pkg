@@ -16,7 +16,8 @@ mav = MavrosNode.MavrosNode()
 trajectory = Trajectory.Trajectory()
 altitude = 0.5
 radius = 0.5
-duration = 10.0
+duration = 20.0
+duration_dmd = 60
 rate_ctrl = rospy.Rate(10)
 
 # -------------------------------------------------------------
@@ -138,7 +139,7 @@ start_time = rospy.Time.now()
 
 rospy.loginfo("Start circle trajectory with DMD")
 while (not rospy.is_shutdown() 
-        and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
+        and (rospy.Time.now() - start_time) < rospy.Duration(duration_dmd)):
     
     start = rospy.Time.now()
     
