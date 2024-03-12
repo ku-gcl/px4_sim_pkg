@@ -1,6 +1,5 @@
 
 import rospy
-import math
 import numpy as np
 import px4_sim_pkg.MavrosNode as MavrosNode
 import px4_sim_pkg.Trajectory as Trajectory
