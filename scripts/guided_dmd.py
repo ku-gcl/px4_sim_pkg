@@ -63,11 +63,11 @@ mav.vehicle_takeoff(altitude)
 
 # -------------------------------------------------------------
 # 初期位置に移動
-rospy.sleep(3)
+rospy.sleep(5)
 x, y, z = trajectory.circle(time_sec=0, radius=radius, altitude=altitude)
 mav.set_local_position(x=x, y=y, z=z)
 mav.pub_local_position()
-rospy.sleep(3)
+rospy.sleep(5)
 
 
 # データ格納の配列を用意

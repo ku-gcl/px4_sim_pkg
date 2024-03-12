@@ -36,12 +36,8 @@ mav.set_gym_offset()
 
 # 開始地点をlocal座標で設定
 rospy.loginfo("Sending setpoint ...")
-for i in range(10):
-    # mavros_node.set_destination(x=0, y=0, z=altitude)
-    
-    mav.set_local_position(x=0, y=0, z=altitude)
-    mav.pub_local_position()
-    rate.sleep()
+mav.set_local_position(x=0, y=0, z=altitude)
+mav.pub_local_position()
 rospy.loginfo("Done sending setpoint ...")
 
 
@@ -59,19 +55,15 @@ mav.vehicle_takeoff(altitude)
 
 # -------------------------------------------------------------
 # 初期位置に移動
-rospy.sleep(3)
+rospy.sleep(5)
 x, y, z = trajectory.hover(0, x=0, y=0, altitude=altitude)
-# mav.set_heading(0)
-# mav.set_destination(x=0, y=0, z=altitude)
 mav.set_local_position(x=x, y=y, z=z)
-
 mav.pub_local_position()
-rospy.sleep(3)
+rospy.sleep(5)
 
 
 # 特定の期間ホバリングを実行
 start_time = rospy.Time.now()
-rospy.loginfo(MODE)
 rospy.loginfo("Sending setpoint ...")
 while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(duration):
     if MODE == "hovering":
@@ -79,7 +71,6 @@ while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Durati
         # mav.set_destination(x=0, y=0, z=altitude)
         
         mav.set_local_position(x=0, y=0, z=altitude)
-        
         mav.pub_local_position()
     rate_ctrl.sleep()
 rospy.loginfo("end hovering")
