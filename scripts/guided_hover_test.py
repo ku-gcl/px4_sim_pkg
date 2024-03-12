@@ -81,7 +81,7 @@ while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.DURATI
         
         mav.set_local_position(x=0, y=0, z=ALTITUDE)
         
-        mav.pub_local_position()  
+        mav.pub_local_position()
     rate_ctrl.sleep()
 rospy.loginfo("end hovering")
 rospy.loginfo("Done sending setpoint ...")

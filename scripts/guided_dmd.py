@@ -14,49 +14,60 @@ pred_state_pub = rospy.Publisher('dmd/predict_state', Float64MultiArray, queue_s
 rate = rospy.Rate(20.0)
 mav = MavrosNode.MavrosNode()
 trajectory = Trajectory.Trajectory()
+altitude = 0.5
+radius = 0.5
+duration = 10.0
+rate_ctrl = rospy.Rate(10)
 
-
-rospy.loginfo("Initializing ...")
-# FCU接続を待つ
-while not rospy.is_shutdown() and not mav.current_state.connected:
-    rospy.loginfo("current_state.connected: %s" % (mav.current_state.connected))
-    rospy.sleep(0.1)
-    
+# -------------------------------------------------------------
+# FCUの接続を待つ
 rospy.loginfo("Waiting for connection...")
+while not rospy.is_shutdown() and not mav.current_state.connected:
+    rospy.sleep(0.1)
+
+# allow the subscribers to initialize
+rospy.sleep(5)
 
 # グローバルポジションの原点を設定
 rospy.loginfo("Set Global Position ...")
-latitude = 33.595270
-longitude = 130.215496
-for i in range(100):
-    mav.set_gp_position(latitude, longitude)
+for i in range(10):
+    mav.set_gp_position(latitude=33.595270, longitude=130.215496)
     rate.sleep()
 rospy.loginfo("Done Global Position ...")
 
-altitude = 0.5
-radius = 0.5
+# GYM_OFFSETの計算
+rospy.sleep(3)  # 現在のheadingを取得するための時間
+mav.set_gym_offset()
 
-# セットポイントを送信
+# 開始地点をlocal座標で設定
 rospy.loginfo("Sending setpoint ...")
-for i in range(100):
-    mav.set_local_position(1, 0, altitude)
+for i in range(10):
+    # mavros_node.set_destination(x=0, y=0, z=altitude)
+    
+    mav.set_local_position(x=0, y=0, z=altitude)
+    mav.pub_local_position()
     rate.sleep()
 rospy.loginfo("Done sending setpoint ...")
 
-# GUIDEDモードに設定
-# mav.set_drone_to_guided_mode_auto()
-mav.set_drone_to_guided_mode_manual()
 
-# 機体のアーム
+# -------------------------------------------------------------
+# GUIDEDモードに変更
+mav.set_drone_to_guided_mode_manual()
+# mav.set_drone_to_guided_mode_auto()
+
+# 機体をアーム
 mav.arm_vehicle()
 
 # 離陸
 mav.vehicle_takeoff(altitude)
 
-rospy.sleep(5)
-x, y, z = trajectory.circle(0, radius=radius, altitude=altitude)
-mav.set_local_position(x, y, z)
-rospy.sleep(5)
+# -------------------------------------------------------------
+# 初期位置に移動
+rospy.sleep(3)
+x, y, z = trajectory.circle(time_sec=0, radius=radius, altitude=altitude)
+mav.set_local_position(x=x, y=y, z=z)
+mav.pub_local_position()
+rospy.sleep(3)
 
 
 # データ格納の配列を用意
@@ -67,17 +78,17 @@ force_and_torque = []
 
 # メインループ
 start_time = rospy.Time.now()
-duration = 10.0
-rate_ctrl = rospy.Rate(10)
 
-rospy.loginfo("Start circle trajectory")
+
+rospy.loginfo("Sending setpoint and collecting data...")
 while (not rospy.is_shutdown() 
         and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circle(time_sec, radius=radius, altitude=altitude)
+    x, y, z = trajectory.circle(time_sec=time_sec, radius=radius, altitude=altitude)
     mav.set_local_position(x, y, z)
+    mav.pub_local_position()  
     
     # data collecting
     imu_data.append(mav.imu)
@@ -85,10 +96,6 @@ while (not rospy.is_shutdown()
     force_and_torque.append(mav.force_and_torque)
 
     rate_ctrl.sleep()
-    # rospy.sleep(0.1)
-
-
-# TODO: CSV出力
 
 
 # hovering for calculation
@@ -96,13 +103,14 @@ rospy.loginfo("Hover for DMD calculation")
 rospy.sleep(2.0)
 x, y, z = trajectory.hover(time_sec, x=1.0, y=0.0, altitude=altitude)
 mav.set_local_position(x, y, z)
+mav.pub_local_position()
 rospy.sleep(2.0)
 
 
 # preprocessing and DMD implementation
 rospy.loginfo("DMD calculation start")
+start_dmd_cal = rospy.Time.now()
 # TODO: add data preprocessing
-
 # list to nparray
 y = np.array(imu_data).T
 u = np.array(force_and_torque).T
@@ -115,7 +123,8 @@ dmd = DMD.DMD()
 Y = dmd.concatenate(y, u)
 dmd.splitdata(XX=Y, stateDim=stateDim, aug=aug)
 A = dmd.DMD()
-rospy.loginfo("DMD calculation end")
+finish_dmd_cal = rospy.Time.now()
+rospy.loginfo("DMD calculation end, time: %5.3f", (finish_dmd_cal-start_dmd_cal).to_sec())
 rospy.sleep(5)
 
 rospy.loginfo(A)
@@ -123,8 +132,6 @@ rospy.loginfo(A)
 
 # flight with prediction
 start_time = rospy.Time.now()
-duration = 60.0
-rate_ctrl = rospy.Rate(10)
 
 rospy.loginfo("Start circle trajectory with DMD")
 while (not rospy.is_shutdown() 
@@ -134,16 +141,15 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circle(time_sec, radius=radius, altitude=altitude)
-    mav.set_local_position(x, y, z)
+    x, y, z = trajectory.circle(time_sec=time_sec, radius=radius, altitude=altitude)
+    mav.set_local_position(x=x, y=y, z=z)
+    mav.pub_local_position()
     
     # mav.imu, mav.rcout_norm, mav.force_and_torqueをNumPy配列に変換
     imu_np = np.array(mav.imu)
     force_and_torque_np = np.array(mav.force_and_torque)[1:4]  # [1:4]で特定の要素を抽出
-    
-    # これらを1行のベクトルに変換
+    # 1行のベクトルに変換
     data_vector = np.concatenate([imu_np, force_and_torque_np])
-
     # DMDによる状態予測
     x_k1 = dmd.predictstate(data_vector)  # reshape(-1, 1)で2次元配列に変換
 
@@ -152,16 +158,14 @@ while (not rospy.is_shutdown()
     pred_msg.data = x_k1.flatten()  # flatten()で1次元配列に変換
     pred_state_pub.publish(pred_msg)
 
-    # finish = rospy.Time.now()
-    # rospy.loginfo("DMD calculation", (finish-start).to_sec())
-
     rate_ctrl.sleep()
 
 
 # 着陸
 rospy.loginfo("Sending setpoint ...")
-for i in range(100):
-    mav.set_local_position(0, 0, altitude)
+for i in range(10):
+    mav.set_local_position(x=0, y=0, z=altitude)
+    mav.pub_local_position()
     rate.sleep()
 rospy.loginfo("Done sending setpoint ...")
 mav.send_land_command()
