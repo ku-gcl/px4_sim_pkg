@@ -9,8 +9,8 @@ mav = MavrosNode.MavrosNode()
 trajectory = Trajectory.Trajectory()
 rate = rospy.Rate(10.0)
 MODE = "hovering"  # 飛行モードの選択: circle, updown, eight, hovering
-ALTITUDE = 0.5
-DURATION = 60.0
+altitude = 0.5
+duration = 60.0
 rate_ctrl = rospy.Rate(20.0)
 
 
@@ -37,9 +37,9 @@ mav.set_gym_offset()
 # 開始地点をlocal座標で設定
 rospy.loginfo("Sending setpoint ...")
 for i in range(10):
-    # mavros_node.set_destination(x=0, y=0, z=ALTITUDE)
+    # mavros_node.set_destination(x=0, y=0, z=altitude)
     
-    mav.set_local_position(x=0, y=0, z=ALTITUDE)
+    mav.set_local_position(x=0, y=0, z=altitude)
     mav.pub_local_position()
     rate.sleep()
 rospy.loginfo("Done sending setpoint ...")
@@ -54,15 +54,15 @@ mav.set_drone_to_guided_mode_manual()
 mav.arm_vehicle()
 
 # 離陸
-mav.vehicle_takeoff(ALTITUDE)
+mav.vehicle_takeoff(altitude)
 
 
 # -------------------------------------------------------------
 # 初期位置に移動
 rospy.sleep(3)
-x, y, z = trajectory.hover(0, x=0, y=0, altitude=ALTITUDE)
+x, y, z = trajectory.hover(0, x=0, y=0, altitude=altitude)
 # mav.set_heading(0)
-# mav.set_destination(x=0, y=0, z=ALTITUDE)
+# mav.set_destination(x=0, y=0, z=altitude)
 
 mav.set_local_position(x=x, y=y, z=z)
 
@@ -74,12 +74,12 @@ rospy.sleep(3)
 start_time = rospy.Time.now()
 rospy.loginfo(MODE)
 rospy.loginfo("Sending setpoint ...")
-while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.DURATION(DURATION):
+while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(duration):
     if MODE == "hovering":
         # mav.set_heading(0)
-        # mav.set_destination(x=0, y=0, z=ALTITUDE)
+        # mav.set_destination(x=0, y=0, z=altitude)
         
-        mav.set_local_position(x=0, y=0, z=ALTITUDE)
+        mav.set_local_position(x=0, y=0, z=altitude)
         
         mav.pub_local_position()
     rate_ctrl.sleep()

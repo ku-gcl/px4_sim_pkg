@@ -65,10 +65,7 @@ target_link_libraries(pose_transformer ${catkin_LIBRARIES})
 catkin_install_python(PROGRAMS
   # scripts/archive/ardu_guided.py
   scripts/pose_transformer.py
-  scripts/guided.py
   scripts/guided_dmd.py
-  scripts/guided_hover.py
   scripts/guided_hover_test.py
-  scripts/guided_hover_test2.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
