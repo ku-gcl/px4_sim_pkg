@@ -42,9 +42,8 @@ mav.set_gym_offset()
 # 開始地点をlocal座標で設定
 rospy.loginfo("Sending setpoint ...")
 for i in range(10):
-    # mavros_node.set_destination(x=0, y=0, z=altitude)
-    
-    mav.set_local_position(x=0, y=0, z=altitude)
+    mav.set_destination(x=0, y=0, z=altitude)
+    # mav.set_local_position(x=0, y=0, z=altitude)
     mav.pub_local_position()
     rate.sleep()
 rospy.loginfo("Done sending setpoint ...")
@@ -64,8 +63,10 @@ mav.vehicle_takeoff(altitude)
 # -------------------------------------------------------------
 # 初期位置に移動
 rospy.sleep(5)
+mav.set_heading(0)
 x, y, z = trajectory.circle(time_sec=0, radius=radius, altitude=altitude)
-mav.set_local_position(x=x, y=y, z=z)
+mav.set_destination(x=x, y=y, z=z)
+# mav.set_local_position(x=x, y=y, z=z)
 mav.pub_local_position()
 rospy.sleep(5)
 
@@ -87,7 +88,8 @@ while (not rospy.is_shutdown()
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
     x, y, z = trajectory.circle(time_sec=time_sec, radius=radius, altitude=altitude)
-    mav.set_local_position(x, y, z)
+    mav.set_destination(x, y, z)
+    # mav.set_local_position(x, y, z)
     mav.pub_local_position()  
     
     # data collecting
@@ -102,7 +104,8 @@ while (not rospy.is_shutdown()
 rospy.loginfo("Hover for DMD calculation")
 rospy.sleep(2.0)
 x, y, z = trajectory.hover(time_sec, x=1.0, y=0.0, altitude=altitude)
-mav.set_local_position(x, y, z)
+mav.set_destination(x, y, z)
+# mav.set_local_position(x, y, z)
 mav.pub_local_position()
 rospy.sleep(2.0)
 
@@ -142,7 +145,8 @@ while (not rospy.is_shutdown()
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
     x, y, z = trajectory.circle(time_sec=time_sec, radius=radius, altitude=altitude)
-    mav.set_local_position(x=x, y=y, z=z)
+    mav.set_destination(x, y, z)
+    # mav.set_local_position(x=x, y=y, z=z)
     mav.pub_local_position()
     
     # mav.imu, mav.rcout_norm, mav.force_and_torqueをNumPy配列に変換
@@ -164,7 +168,8 @@ while (not rospy.is_shutdown()
 # 着陸
 rospy.loginfo("Sending setpoint ...")
 for i in range(10):
-    mav.set_local_position(x=0, y=0, z=altitude)
+    mav.set_destination(x, y, z)
+    # mav.set_local_position(x=0, y=0, z=altitude)
     mav.pub_local_position()
     rate.sleep()
 rospy.loginfo("Done sending setpoint ...")
