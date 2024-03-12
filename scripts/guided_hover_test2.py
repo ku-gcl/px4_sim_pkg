@@ -8,13 +8,18 @@ from geographic_msgs.msg import GeoPointStamped
 # ノードの初期化後の処理や変数の設定
 rospy.init_node('offb_node', anonymous=True)
 mav = MavrosNode.MavrosNode()
-rate = rospy.Rate(10.0)    
+trajectory = Trajectory.Trajectory()
+rate = rospy.Rate(10.0)
 MODE = "hovering"  # 飛行モードの選択: circle, updown, eight, hovering
-HEIGHT = 0.5
+ALTITUDE = 0.5
+DURATION = 60.0
+rate_ctrl = rospy.Rate(20.0)
 
+
+# -------------------------------------------------------------
 # FCUの接続を待つ
 rospy.loginfo("Waiting for connection...")
-while not mav.current_state.connected:
+while not rospy.is_shutdown() and not mav.current_state.connected:
     rospy.sleep(0.1)
 
 # allow the subscribers to initialize
@@ -32,10 +37,17 @@ rospy.sleep(3)  # 現在のheadingを取得するための時間
 mav.set_gym_offset()
 
 # 開始地点をlocal座標で設定
-# mavros_node.set_destination(x=0, y=0, z=0.5)
-mav.set_local_position(x=0, y=0, z=HEIGHT)
-mav.pub_local_position()
+rospy.loginfo("Sending setpoint ...")
+for i in range(10):
+    # mavros_node.set_destination(x=0, y=0, z=ALTITUDE)
+    
+    mav.set_local_position(x=0, y=0, z=ALTITUDE)
+    mav.pub_local_position()
+    rate.sleep()
+rospy.loginfo("Done sending setpoint ...")
 
+
+# -------------------------------------------------------------
 # GUIDEDモードに変更
 mav.set_drone_to_guided_mode_manual()
 # mav.set_drone_to_guided_mode_auto()
@@ -44,25 +56,39 @@ mav.set_drone_to_guided_mode_manual()
 mav.arm_vehicle()
 
 # 離陸
-mav.vehicle_takeoff(0.5)
+mav.vehicle_takeoff(ALTITUDE)
 
-rospy.sleep(5)  # 安定を待つ
-mav.set_heading(0)
+
+# -------------------------------------------------------------
+# 初期位置に移動
+rospy.sleep(3)
+x, y, z = trajectory.hover(0, x=0, y=0, altitude=ALTITUDE)
+# mav.set_heading(0)
+# mav.set_destination(x=0, y=0, z=ALTITUDE)
+
+mav.set_local_position(x=x, y=y, z=z)
+
+mav.pub_local_position()
+rospy.sleep(3)
+
 
 # 特定の期間ホバリングを実行
 start_time = rospy.Time.now()
-duration = 60.0
-rate_ctrl = rospy.Rate(20)
-HEIGHT = 0.5
-
-rospy.loginfo("HOVERING")
-while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.Duration(duration):
+rospy.loginfo(MODE)
+rospy.loginfo("Sending setpoint ...")
+while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < rospy.DURATION(DURATION):
     if MODE == "hovering":
-        # mavros_node.set_destination(x=0, y=0, z=HEIGHT)
-        mav.set_local_position(x=0, y=0, z=HEIGHT)
-        mav.pub_local_position()        
-    rate_ctrl.sleep()  # 0.1秒ごとにループ
+        # mav.set_heading(0)
+        # mav.set_destination(x=0, y=0, z=ALTITUDE)
+        
+        mav.set_local_position(x=0, y=0, z=ALTITUDE)
+        
+        mav.pub_local_position()  
+    rate_ctrl.sleep()
 rospy.loginfo("end hovering")
+rospy.loginfo("Done sending setpoint ...")
 
+
+# -------------------------------------------------------------
 # 着陸
 mav.send_land_command()
