@@ -104,7 +104,7 @@ while (not rospy.is_shutdown()
 # hovering for calculation
 amplitude = 1.0
 altitude = 1.0
-w = 1.3
+w = 3.0
 
 rospy.loginfo("Hover for DMD calculation")
 rospy.sleep(2.0)
