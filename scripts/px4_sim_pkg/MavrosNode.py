@@ -18,13 +18,13 @@ class MavrosNode():
         self.geo = GeoPointStamped()
         self.pose = PoseStamped()
         
-        self.state_sub = rospy.Subscriber("mavros/state", State, self.state_cb)     # arming events
-        self.rcout_sub = rospy.Subscriber("mavros/rc/out", RCOut, self.rcout_cb)
-        self.imu_sub = rospy.Subscriber("mavros/imu/data", Imu, self.imu_cb)
-        self.heading_sub = rospy.Subscriber("mavros/global_position/compass_hdg", Float64, self.heading_cb)
+        self.state_sub = rospy.Subscriber("mavros/state", State, self.state_cb, queue_size=1)     # arming events
+        self.rcout_sub = rospy.Subscriber("mavros/rc/out", RCOut, self.rcout_cb, queue_size=1)
+        self.imu_sub = rospy.Subscriber("mavros/imu/data", Imu, self.imu_cb, queue_size=1)
+        self.heading_sub = rospy.Subscriber("mavros/global_position/compass_hdg", Float64, self.heading_cb, queue_size=1)
         
-        self.local_pos_pub = rospy.Publisher("mavros/setpoint_position/local", PoseStamped, queue_size=10)
-        self.set_gp_origin_pub = rospy.Publisher("mavros/global_position/set_gp_origin", GeoPointStamped, queue_size=10)
+        self.local_pos_pub = rospy.Publisher("mavros/setpoint_position/local", PoseStamped, queue_size=1)
+        self.set_gp_origin_pub = rospy.Publisher("mavros/global_position/set_gp_origin", GeoPointStamped, queue_size=1)
         self.arming_client = rospy.ServiceProxy("mavros/cmd/arming", CommandBool)
         self.set_mode_client = rospy.ServiceProxy("mavros/set_mode", SetMode)
         self.takeoff_client = rospy.ServiceProxy("mavros/cmd/takeoff", CommandTOL)
