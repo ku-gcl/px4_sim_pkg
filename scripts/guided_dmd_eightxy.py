@@ -14,8 +14,13 @@ pred_state_pub = rospy.Publisher('dmd/predict_state', Float64MultiArray, queue_s
 rate = rospy.Rate(20.0)
 mav = MavrosNode.MavrosNode()
 trajectory = Trajectory.Trajectory()
-altitude = 0.5
-radius = 0.5
+altitude = 1.0
+radius = 1.0
+# eightxy for calculation
+amplitude = 1.0
+base_altitude = 1.0
+
+
 duration = 20.0
 duration_dmd = 60
 rate_ctrl = rospy.Rate(10)
@@ -101,10 +106,11 @@ while (not rospy.is_shutdown()
     rate_ctrl.sleep()
 
 
-# hovering for calculation
+
+
 rospy.loginfo("Hover for DMD calculation")
 rospy.sleep(2.0)
-x, y, z = trajectory.hover(time_sec, x=1.0, y=0.0, altitude=altitude)
+x, y, z = trajectory.eightXY(time_sec=0, amplitude=amplitude, altitude=altitude)
 mav.set_destination(x, y, z)
 # mav.set_local_position(x, y, z)
 mav.pub_local_position()
@@ -145,7 +151,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circle(time_sec=time_sec, radius=radius, altitude=altitude)
+    x, y, z = trajectory.eightXY(time_sec=time_sec, amplitude=amplitude, altitude=altitude)
     mav.set_destination(x, y, z)
     # mav.set_local_position(x=x, y=y, z=z)
     mav.pub_local_position()

@@ -73,7 +73,7 @@ class Trajectory():
         z = amplitude * math.sin(time_sec) * math.cos(time_sec) + altitude
         return x, y, z
     
-    def updown(self, time_sec, amplitude=0.5, base_altitude=1.5):
+    def updown(self, time_sec, amplitude=0.5, base_altitude=1.5, w=0.7):
         """
         上下運動を実現するためのポイントを計算します。
         
@@ -87,10 +87,10 @@ class Trajectory():
         """
         x = 0
         y = 0
-        z = base_altitude + amplitude * math.sin(time_sec)
+        z = base_altitude + amplitude * math.sin(w*time_sec)
         return x, y, z
     
-    def rightleft(self, time_sec, amplitude=1.0, altitude=1.5):
+    def rightleft(self, time_sec, amplitude=1.0, altitude=1.5, w=0.7):
         """
         左右運動を実現するためのポイントを計算します。
         
@@ -102,7 +102,7 @@ class Trajectory():
         Returns:
         tuple: (x, y, z) 座標
         """
-        x = amplitude * math.sin(time_sec)
+        x = amplitude * math.sin(w*time_sec)
         y = 0
         z = altitude
         return x, y, z
