@@ -46,8 +46,8 @@
     </node>
     <!-- Relay MoCap data to /mavros/vision_pose/pose -->
     <!-- <node name="pose_transformer_node" pkg="px4_sim_pkg" type="pose_transformer.py" output="screen"/> -->
-    <node name="pose_transformer" pkg="px4_sim_pkg" type="pose_transformer" output="screen" />
-
+    <!-- <node name="pose_transformer" pkg="px4_sim_pkg" type="pose_transformer" output="screen" /> -->
+    <node name="mavros_relay_mocap" pkg="topic_tools" type="relay" args="/mocap_node/Robot_1/pose /mavros/vision_pose/pose" output="screen"/>
 
 
     <!-- Step4: Execute custom ROS node -->
