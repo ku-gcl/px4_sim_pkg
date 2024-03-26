@@ -110,7 +110,7 @@ while (not rospy.is_shutdown()
 
 rospy.loginfo("Hover for DMD calculation")
 rospy.sleep(2.0)
-x, y, z = trajectory.eightXY(time_sec=0, amplitude=amplitude, altitude=altitude)
+x, y, z = trajectory.eightXY(time_sec=0, ampx=amplitude, ampy=amplitude, w=1.0, altitude=altitude)
 mav.set_destination(x, y, z)
 # mav.set_local_position(x, y, z)
 mav.pub_local_position()
@@ -151,7 +151,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.eightXY(time_sec=time_sec, amplitude=amplitude, altitude=altitude)
+    x, y, z = trajectory.eightXY(time_sec=time_sec, ampx=amplitude, ampy=amplitude, w=1.0, altitude=altitude)
     mav.set_destination(x, y, z)
     # mav.set_local_position(x=x, y=y, z=z)
     mav.pub_local_position()
