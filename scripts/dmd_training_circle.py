@@ -1,8 +1,10 @@
 from datetime import datetime
+import os
 import rospy
+import rospkg
 import numpy as np
 import json
-from std_msgs.msg import Float64MultiArray, String  # 予測された状態をパブリッシュするために使用
+from std_msgs.msg import Float64MultiArray  # 予測された状態をパブリッシュするために使用
 import px4_sim_pkg.MavrosNode as MavrosNode
 import px4_sim_pkg.Trajectory as Trajectory
 import px4_sim_pkg.DMD as DMD
@@ -12,7 +14,7 @@ rospy.init_node('dmd_training_node', anonymous=True)
 
 # pred_state_pub = rospy.Publisher('dmd/predict_state', Float64MultiArray, queue_size=10)
 data_pub = rospy.Publisher('dmd/data', Float64MultiArray, queue_size=10)
-dmd_info_pub = rospy.Publisher('dmd/info', String, queue_size=10)
+dmd_info_pub = rospy.Publisher('dmd/info', Float64MultiArray, queue_size=10)
 dmd_A_pub = rospy.Publisher('dmd/A', Float64MultiArray, queue_size=10)
 
 
@@ -90,7 +92,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circleXY(time_sec=0, radius=radius, w=1.0, altitude=altitude)
+    x, y, z = trajectory.circleXY(time_sec=time_sec, radius=radius, w=1.0, altitude=altitude)
     mav.set_destination(x, y, z)
     mav.pub_local_position()  
     
@@ -109,6 +111,7 @@ x, y, z = trajectory.circleXZ(time_sec=0, radius=radius, w=1.0, altitude=altitud
 mav.set_destination(x=x, y=y, z=z)
 mav.pub_local_position()
 rospy.sleep(2)
+start_time = rospy.Time.now()
 
 while (not rospy.is_shutdown() 
         and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
@@ -158,16 +161,28 @@ A = dmd.DMD()
 
 # DMD情報のpublish
 finish_dmd_cal = rospy.Time.now()
-calc_time = (finish_dmd_cal - start_time).to_sec()
-dmd_info = {'calculation_time': calc_time, 'imu_data_count': len(imu_data), 'input_data_count': len(force_and_torque)}
-dmd_info_pub.publish(json.dumps(dmd_info))
+calc_time = (finish_dmd_cal - start_dmd_cal).to_sec()
+dmd_info = [calc_time, len(imu_data), len(force_and_torque)]
+dmd_info_msg = Float64MultiArray()
+dmd_info_msg.data = dmd_info
+dmd_info_pub.publish(dmd_info_msg)
 
 # A行列のpublishとファイル保存
 dmd_A_msg = Float64MultiArray(data=A.flatten())
 dmd_A_pub.publish(dmd_A_msg)
+
+
 # A行列を現在の日時を含むファイル名で保存
+# パッケージのパスを取得
+rospack = rospkg.RosPack()
+package_path = rospack.get_path('px4_sim_pkg')
+# dataディレクトリのパスを生成
+data_directory = os.path.join(package_path, 'data')
+# dataディレクトリが存在しない場合は作成
+if not os.path.exists(data_directory):
+    os.makedirs(data_directory)
 current_time_str = datetime.now().strftime("%Y%m%d%H%M%S")
-filename = f"A_{current_time_str}.csv"
+filename = os.path.join(data_directory, f"A_matrix_{current_time_str}.csv")
 np.savetxt(filename, A, delimiter=',')
 rospy.loginfo(f"A matrix saved to {filename}")
 
@@ -179,8 +194,7 @@ rospy.sleep(5)
 # 着陸
 rospy.loginfo("Sending setpoint ...")
 for i in range(10):
-    mav.set_destination(x, y, z)
-    # mav.set_local_position(x=0, y=0, z=altitude)
+    mav.set_destination(x=0, y=0, z=altitude)
     mav.pub_local_position()
     rate.sleep()
 rospy.loginfo("Done sending setpoint ...")
