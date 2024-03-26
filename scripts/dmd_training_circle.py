@@ -21,6 +21,7 @@ mav = MavrosNode.MavrosNode()
 trajectory = Trajectory.Trajectory()
 altitude = 1.25
 radius = 1.0
+w = 0.63
 duration = 30.0
 rate_pred = rospy.Rate(25.0)
 
@@ -68,7 +69,7 @@ mav.vehicle_takeoff(altitude)
 # 初期位置に移動
 rospy.sleep(5)
 mav.set_heading(0)
-x, y, z = trajectory.circleXY(time_sec=0, radius=radius, w=1.0, altitude=altitude)
+x, y, z = trajectory.circleXY(time_sec=0, radius=radius, w=w, altitude=altitude)
 mav.set_destination(x=x, y=y, z=z)
 mav.pub_local_position()
 rospy.sleep(5)
@@ -90,7 +91,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circleXY(time_sec=time_sec, radius=radius, w=1.0, altitude=altitude)
+    x, y, z = trajectory.circleXY(time_sec=time_sec, radius=radius, w=w, altitude=altitude)
     mav.set_destination(x, y, z)
     mav.pub_local_position()  
     
@@ -105,7 +106,7 @@ while (not rospy.is_shutdown()
 
     rate_pred.sleep()
 
-x, y, z = trajectory.circleXZ(time_sec=0, radius=radius, w=1.0, altitude=altitude)
+x, y, z = trajectory.circleXZ(time_sec=0, radius=radius, w=w, altitude=altitude)
 mav.set_destination(x=x, y=y, z=z)
 mav.pub_local_position()
 rospy.sleep(2)
@@ -116,7 +117,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circleXZ(time_sec=time_sec, radius=radius, w=1.0, altitude=altitude)
+    x, y, z = trajectory.circleXZ(time_sec=time_sec, radius=radius, w=w, altitude=altitude)
     mav.set_destination(x, y, z)
     mav.pub_local_position()  
     
@@ -194,6 +195,6 @@ for i in range(10):
     mav.pub_local_position()
     rate.sleep()
 rospy.loginfo("Done sending setpoint ...")
-rospy.sleep(5.0)
+rospy.sleep(2.0)
 mav.send_land_command()
 
