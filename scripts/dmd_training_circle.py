@@ -1,9 +1,7 @@
 from datetime import datetime
 import os
 import rospy
-import rospkg
 import numpy as np
-import json
 from std_msgs.msg import Float64MultiArray  # 予測された状態をパブリッシュするために使用
 import px4_sim_pkg.MavrosNode as MavrosNode
 import px4_sim_pkg.Trajectory as Trajectory
@@ -196,5 +194,6 @@ for i in range(10):
     mav.pub_local_position()
     rate.sleep()
 rospy.loginfo("Done sending setpoint ...")
+rospy.sleep(5.0)
 mav.send_land_command()
 

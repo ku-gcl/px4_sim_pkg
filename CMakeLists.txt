@@ -64,6 +64,7 @@ target_link_libraries(pose_transformer ${catkin_LIBRARIES})
 # Pythonスクリプトをインストールするための設定
 catkin_install_python(PROGRAMS
   scripts/dmd_training_circle.py
+  scripts/dmd_test_circlexy.py
   scripts/pose_transformer.py
   scripts/guided_dmd_circle.py
   scripts/guided_dmd_eightxy.py
