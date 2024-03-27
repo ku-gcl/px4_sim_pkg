@@ -40,7 +40,7 @@ class Trajectory():
         return x, y, z
     
     
-    def circleXY(self, time_sec, radius=1.0, w=1.0, altitude=1.5):
+    def circleXY(self, time_sec, radius=1.0, altitude=1.5, w=1.0):
         """
         指定された時間に基づいて、円軌道上のポイントを計算します。
         
@@ -58,7 +58,7 @@ class Trajectory():
         return x, y, z
     
     
-    def circleXZ(self, time_sec, radius=1.0, w=1.0, altitude=1.5):
+    def circleXZ(self, time_sec, radius=1.0, altitude=1.5, w=1.0):
         """
         指定された時間に基づいて、円軌道上のポイントを計算します。
         
@@ -76,7 +76,7 @@ class Trajectory():
         return x, y, z
     
 
-    def eightXY(self, time_sec, ampx=1.0, ampy=1.0, w=1.0, altitude=1.5):
+    def eightXY(self, time_sec, ampx=1.0, ampy=1.0, altitude=1.5, w=1.0):
         """
         指定された時間に基づいて、8の字軌道上のポイントを計算します。
         
@@ -94,7 +94,7 @@ class Trajectory():
         return x, y, z
 
 
-    def eightXZ(self, time_sec, ampx=1.0, ampz=1.0, w=1.0, altitude=1.5):
+    def eightXZ(self, time_sec, ampx=1.0, ampz=1.0, altitude=1.5, w=1.0):
         """
         指定された時間に基づいて、8の字軌道上のポイントを計算します。
         

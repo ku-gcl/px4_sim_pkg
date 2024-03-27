@@ -18,7 +18,7 @@ rate = rospy.Rate(10.0)
 mav = MavrosNode.MavrosNode()
 trajectory = Trajectory.Trajectory()
 altitude = 1.25
-radius = 1.0
+amp = 1.0
 w = 0.63
 duration_dmd = 60
 rate_pred = rospy.Rate(25.0)
@@ -78,7 +78,7 @@ mav.vehicle_takeoff(altitude)
 # 初期位置に移動
 rospy.sleep(5)
 mav.set_heading(0)
-x, y, z = trajectory.circleXY(time_sec=0, radius=radius, altitude=altitude, w=w)
+x, y, z = trajectory.updown(time_sec=0, amplitude=amp, base_altitude=altitude, w=w)
 mav.set_destination(x=x, y=y, z=z)
 mav.pub_local_position()
 rospy.sleep(5)
@@ -97,7 +97,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circleXY(time_sec=time_sec, radius=radius, altitude=altitude, w=w)
+    x, y, z = trajectory.updown(time_sec=time_sec, amplitude=amp, base_altitude=altitude, w=w)
     mav.set_destination(x, y, z)
     mav.pub_local_position()
     

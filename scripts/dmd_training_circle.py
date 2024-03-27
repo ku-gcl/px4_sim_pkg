@@ -69,7 +69,7 @@ mav.vehicle_takeoff(altitude)
 # 初期位置に移動
 rospy.sleep(5)
 mav.set_heading(0)
-x, y, z = trajectory.circleXY(time_sec=0, radius=radius, w=w, altitude=altitude)
+x, y, z = trajectory.circleXY(time_sec=0, radius=radius, altitude=altitude, w=w)
 mav.set_destination(x=x, y=y, z=z)
 mav.pub_local_position()
 rospy.sleep(5)
@@ -91,7 +91,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circleXY(time_sec=time_sec, radius=radius, w=w, altitude=altitude)
+    x, y, z = trajectory.circleXY(time_sec=time_sec, radius=radius, altitude=altitude, w=w)
     mav.set_destination(x, y, z)
     mav.pub_local_position()  
     
@@ -106,7 +106,7 @@ while (not rospy.is_shutdown()
 
     rate_pred.sleep()
 
-x, y, z = trajectory.circleXZ(time_sec=0, radius=radius, w=w, altitude=altitude)
+x, y, z = trajectory.circleXZ(time_sec=0, radius=radius, altitude=altitude, w=w)
 mav.set_destination(x=x, y=y, z=z)
 mav.pub_local_position()
 rospy.sleep(2)
@@ -117,7 +117,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circleXZ(time_sec=time_sec, radius=radius, w=w, altitude=altitude)
+    x, y, z = trajectory.circleXZ(time_sec=time_sec, radius=radius, altitude=altitude, w=w)
     mav.set_destination(x, y, z)
     mav.pub_local_position()  
     
@@ -133,7 +133,7 @@ while (not rospy.is_shutdown()
     rate_pred.sleep()
 
 
-# hovering for calculation
+# hovering for calculation``
 rospy.loginfo("Hover for DMD calculation")
 rospy.sleep(2.0)
 x, y, z = trajectory.hover(time_sec, x=0.0, y=0.0, altitude=altitude)
