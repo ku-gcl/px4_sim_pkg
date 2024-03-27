@@ -108,7 +108,7 @@ class Trajectory():
         """
         x = ampx * math.sin(w*time_sec)
         y = 0
-        z = ampy * math.sin(2*w*time_sec) + altitude
+        z = ampz * math.sin(2*w*time_sec) + altitude
         return x, y, z
 
     

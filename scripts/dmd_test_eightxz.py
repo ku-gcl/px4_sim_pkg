@@ -19,7 +19,7 @@ mav = MavrosNode.MavrosNode()
 trajectory = Trajectory.Trajectory()
 altitude = 1.25
 ampx = 1.25
-ampy = 1.0
+ampz = 1.0
 w = 0.63
 duration_dmd = 60
 rate_pred = rospy.Rate(25.0)
@@ -98,7 +98,7 @@ while (not rospy.is_shutdown()
     
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.eightXZ(time_sec=t, ampx=ampx, ampz=ampz, altitude=altitude, w=w)
+    x, y, z = trajectory.eightXZ(time_sec=time_sec, ampx=ampx, ampz=ampz, altitude=altitude, w=w)
     mav.set_destination(x, y, z)
     mav.pub_local_position()
     
