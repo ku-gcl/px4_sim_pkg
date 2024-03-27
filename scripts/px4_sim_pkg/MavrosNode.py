@@ -83,10 +83,19 @@ class MavrosNode():
         orientation_q = msg.orientation
         orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
         roll, pitch, yaw = euler_from_quaternion(orientation_list)
-        # rospy.loginfo("R: %5.2f, P: %5.2f, Y: %5.2f" % (roll, pitch, yaw))
-        
         # 角速度
         angvel = msg.angular_velocity
+        
+        # orientation_list = [orientation_q.x, -orientation_q.y, -orientation_q.z, orientation_q.w]
+        # roll, pitch, yaw = euler_from_quaternion(orientation_list)
+        # angvel_temp = msg.angular_velocity
+        # angvel = msg.angular_velocity
+        # angvel.x = angvel_temp.x
+        # angvel.y = -angvel_temp.y
+        # angvel.z = -angvel_temp.z
+        
+        # rospy.loginfo("R: %5.2f, P: %5.2f, Y: %5.2f" % (roll, pitch, yaw))
+        
         
         # 姿勢角と角速度をimuに格納
         self.imu = [roll, pitch, yaw, angvel.x, angvel.y, angvel.z]
