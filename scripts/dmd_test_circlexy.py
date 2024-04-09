@@ -19,8 +19,8 @@ mav = MavrosNode.MavrosNode()
 trajectory = Trajectory.Trajectory()
 altitude = 1.25
 radius = 1.0
-# w = 0.63
-w = 1.0
+w = 0.63
+# w = 1.0
 duration_dmd = 60
 rate_pred = rospy.Rate(25.0)
 
