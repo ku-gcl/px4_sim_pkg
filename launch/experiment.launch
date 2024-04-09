@@ -49,10 +49,11 @@
         <rosparam file="$(arg mocap_config_file)" command="load" />
     </node>
     <!-- Relay MoCap data to /mavros/vision_pose/pose -->
+    <node name="mavros_relay_mocap" pkg="topic_tools" type="relay" args="/mocap_node/Robot_1/pose /mavros/vision_pose/pose" output="screen"/>
+    
     <!-- <node name="pose_transformer_node" pkg="px4_sim_pkg" type="pose_transformer.py" output="screen"/> -->
-    <node name="pose_transformer" pkg="px4_sim_pkg" type="pose_transformer" output="screen" />
-
+    <!-- <node name="pose_transformer" pkg="px4_sim_pkg" type="pose_transformer" output="screen" /> -->
 
     <!-- Step4: Execute custom ROS node -->
-    <!-- <node name="ardu_guided_node" pkg="px4_sim_pkg" type="guided_dmd.py" output="screen"/> -->
+    <!-- <node name="ardu_guided_node" pkg="px4_sim_pkg" type="ardu_guided" output="screen"/> -->
 </launch>
