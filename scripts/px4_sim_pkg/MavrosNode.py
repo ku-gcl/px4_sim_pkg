@@ -71,8 +71,8 @@ class MavrosNode():
         c1, c2, c3, c4 = self.rcout_normalize(rcout)
         thrust =  (c1 + c2 + c3 + c4)/4
         roll   = (-c1 + c2 + c3 - c4)/4
-        pitch  =  (c1 - c2 + c3 - c4)/4
-        yaw    =  (c1 + c2 - c3 - c4)/4
+        pitch  = (-c1 + c2 - c3 + c4)/4
+        yaw    = (-c1 - c2 + c3 + c4)/4
         
         self.rcout = [rcout.channels[0], rcout.channels[1], rcout.channels[2], rcout.channels[3]]
         self.rcout_norm = [c1, c2, c3, c4]
