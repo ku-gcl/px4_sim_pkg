@@ -38,8 +38,45 @@ class Trajectory():
         y = radius * math.sin(time_sec)
         z = altitude
         return x, y, z
+    
+    
+    def circleXY(self, time_sec, radius=1.0, altitude=1.5, w=1.0):
+        """
+        指定された時間に基づいて、円軌道上のポイントを計算します。
+        
+        Parameters:
+        time_sec (float): 開始からの経過時間（秒）
+        radius (float): 円軌道の半径
+        altitude (float): 飛行高度
+        
+        Returns:
+        tuple: (x, y, z) 座標
+        """
+        x = radius * math.cos(w*time_sec)
+        y = radius * math.sin(w*time_sec)
+        z = altitude
+        return x, y, z
+    
+    
+    def circleXZ(self, time_sec, radius=1.0, altitude=1.5, w=1.0):
+        """
+        指定された時間に基づいて、円軌道上のポイントを計算します。
+        
+        Parameters:
+        time_sec (float): 開始からの経過時間（秒）
+        radius (float): 円軌道の半径
+        altitude (float): 飛行高度
+        
+        Returns:
+        tuple: (x, y, z) 座標
+        """
+        x = radius * math.cos(w*time_sec)
+        y = 0
+        z = radius * math.sin(w*time_sec) + altitude
+        return x, y, z
+    
 
-    def eightXY(self, time_sec, amplitude=1.0, altitude=1.5):
+    def eightXY(self, time_sec, ampx=1.0, ampy=1.0, altitude=1.5, w=1.0):
         """
         指定された時間に基づいて、8の字軌道上のポイントを計算します。
         
@@ -51,12 +88,13 @@ class Trajectory():
         Returns:
         tuple: (x, y, z) 座標
         """
-        x = amplitude * math.sin(time_sec)
-        y = amplitude * math.sin(time_sec) * math.cos(time_sec)
+        x = ampx * math.sin(w*time_sec)
+        y = ampy * math.sin(2*w*time_sec)
         z = altitude
         return x, y, z
 
-    def eightXZ(self, time_sec, amplitude=1.0, altitude=1.5):
+
+    def eightXZ(self, time_sec, ampx=1.0, ampz=1.0, altitude=1.5, w=1.0):
         """
         指定された時間に基づいて、8の字軌道上のポイントを計算します。
         
@@ -68,12 +106,13 @@ class Trajectory():
         Returns:
         tuple: (x, y, z) 座標
         """
-        x = amplitude * math.sin(time_sec)
+        x = ampx * math.sin(w*time_sec)
         y = 0
-        z = amplitude * math.sin(time_sec) * math.cos(time_sec) + altitude
+        z = ampz * math.sin(2*w*time_sec) + altitude
         return x, y, z
+
     
-    def updown(self, time_sec, amplitude=0.5, base_altitude=1.5):
+    def updown(self, time_sec, amplitude=0.5, base_altitude=1.5, w=0.7):
         """
         上下運動を実現するためのポイントを計算します。
         
@@ -87,10 +126,10 @@ class Trajectory():
         """
         x = 0
         y = 0
-        z = base_altitude + amplitude * math.sin(time_sec)
+        z = base_altitude + amplitude * math.sin(w*time_sec)
         return x, y, z
     
-    def rightleft(self, time_sec, amplitude=1.0, altitude=1.5):
+    def rightleft(self, time_sec, amplitude=1.0, altitude=1.5, w=0.7):
         """
         左右運動を実現するためのポイントを計算します。
         
@@ -102,7 +141,7 @@ class Trajectory():
         Returns:
         tuple: (x, y, z) 座標
         """
-        x = amplitude * math.sin(time_sec)
+        x = amplitude * math.sin(w*time_sec)
         y = 0
         z = altitude
         return x, y, z

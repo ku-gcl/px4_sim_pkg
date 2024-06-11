@@ -4,11 +4,7 @@
 	<!-- for Experiment -->
     <!-- roslaunch apm.launch fcu_url:=/dev/ttyS0:921600 gcs_url:=udp://:14550@192.168.0.173:14557 -->
 	<arg name="fcu_url" default="/dev/ttyS0:921600" />
-	<arg name="gcs_url" default="udp://:14550@192.168.0.173:14557" />
-
-	<!-- for SITL -->
-	<!-- <arg name="fcu_url" default="udp://127.0.0.1:14550@14555" />
-	<arg name="gcs_url" default="" /> -->
+	<arg name="gcs_url" default="udp://:14550@192.168.1.198:14557" />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
 	<arg name="log_output" default="screen" />
@@ -49,11 +45,11 @@
         <rosparam file="$(arg mocap_config_file)" command="load" />
     </node>
     <!-- Relay MoCap data to /mavros/vision_pose/pose -->
-    <node name="mavros_relay_mocap" pkg="topic_tools" type="relay" args="/mocap_node/Robot_1/pose /mavros/vision_pose/pose" output="screen"/>
-    
     <!-- <node name="pose_transformer_node" pkg="px4_sim_pkg" type="pose_transformer.py" output="screen"/> -->
     <!-- <node name="pose_transformer" pkg="px4_sim_pkg" type="pose_transformer" output="screen" /> -->
+    <node name="mavros_relay_mocap" pkg="topic_tools" type="relay" args="/mocap_node/Robot_1/pose /mavros/vision_pose/pose" output="screen"/>
+
 
     <!-- Step4: Execute custom ROS node -->
-    <!-- <node name="ardu_guided_node" pkg="px4_sim_pkg" type="ardu_guided" output="screen"/> -->
+    <!-- <node name="ardu_guided_node" pkg="px4_sim_pkg" type="guided_dmd.py" output="screen"/> -->
 </launch>
