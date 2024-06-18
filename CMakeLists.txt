@@ -67,14 +67,10 @@ catkin_install_python(PROGRAMS
   scripts/dmd_test_eightxz.py
   scripts/dmd_test_rightleft.py
   scripts/dmd_test_updown.py
-  scripts/dmd_training_circle.py
+  scripts/dmd_train_circle.py
   scripts/pose_transformer.py
-  scripts/guided_dmd_circle.py
-  scripts/guided_dmd_eightxy.py
-  scripts/guided_dmd_rightleft.py
-  scripts/guided_dmd_updown.py
-  scripts/guided_hover.py
+  scripts/guided_hover_test.py
   scripts/guided_circle_test.py
-  scripts/guided_hover_test_mocap_optitrack.py
+  scripts/rtdmd_test.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
