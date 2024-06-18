@@ -27,10 +27,9 @@ class RTDMD():
     def concatenate(self, data1, data2):
         return np.concatenate([data1, data2], axis=0)
 
-
-    def delay_coordinate_maker(self, x):
+    def create_delay_coordinates(self, x):
         """
-        DELAY_COORDINATE_MAKER
+        CREATE_DELAY_COORDINATES
         Description:
         Function to create delay coordinates
         Stack time series data
@@ -65,8 +64,7 @@ class RTDMD():
 
         return x_delay
 
-
-    def predictstate(self, A, X, nTime):
+    def predict_state(self, A, X, nTime):
         """
         Predicts state using A-matrix obtained by DMD.
         Parameters:
@@ -94,8 +92,7 @@ class RTDMD():
 
         return xPredict
 
-
-    def fit(self, Actual, Predicted):
+    def calculate_fit_error(self, Actual, Predicted):
         """
         Calculates fit error between actual and predicted data.
         Parameters:
@@ -118,9 +115,10 @@ class RTDMD():
 
         return E
 
-
-    def RTDMDUpdate(self, AB, XXUU, new_XXUU, P, count):
+    def update_rtdmd(self, XXUU, new_XXUU, count):
         y = new_XXUU[:self.augStateDim]
+        P = self.rtdmdResult["P"]
+        AB = self.rtdmdResult["AB"]
 
         y_hat_prior = AB @ XXUU
         error = y - y_hat_prior
