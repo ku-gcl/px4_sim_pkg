@@ -12,7 +12,7 @@ class RTDMD():
         self.augStateDim = aug * stateDim
         self.augInputDim = aug * inputDim
         self.augStateInputDim = aug * self.stateInputDim
-        self.dmd = {
+        self.rtdmdResult = {
             'P': np.eye(self.augStateInputDim) / delta,
             'AB': np.zeros((aug * stateDim, self.augStateInputDim)),
             'A': np.zeros((aug * stateDim, aug * stateDim)),
@@ -21,8 +21,11 @@ class RTDMD():
             'y_hat': np.zeros(stateDim),
             'error': np.zeros(aug * stateDim),
         }
-        return dmd
+        # return dmd
 
+
+    def concatenate(self, data1, data2):
+        return np.concatenate([data1, data2], axis=0)
 
 
     def delay_coordinate_maker(self, x):
@@ -54,11 +57,11 @@ class RTDMD():
         aug_col = x_col - self.aug + 1
         x_delay = np.zeros((aug_dim, aug_col))
 
-        print(f"aug: {aug}")  # Number of extended rows per type of data
+        print(f"aug: {self.aug}")  # Number of extended rows per type of data
         print(f"aug dimension: {aug_dim} x {aug_col}")  # Number of rows and columns of the augmented matrix
 
         for i in range(aug_col):
-            x_delay[:, i] = x[:, i:i+aug].reshape(aug_dim, order="F")
+            x_delay[:, i] = x[:, i:i+self.aug].reshape(aug_dim, order="F")
 
         return x_delay
 
@@ -116,12 +119,12 @@ class RTDMD():
         return E
 
 
-    def RTDMD(self, AB, XXUU, new_XXUU, P, count):
+    def RTDMDUpdate(self, AB, XXUU, new_XXUU, P, count):
         y = new_XXUU[:self.augStateDim]
 
         y_hat_prior = AB @ XXUU
         error = y - y_hat_prior
-        g = (P @ XXUU) / (lambda_ + XXUU.T @ P @ XXUU)
+        g = (P @ XXUU) / (self.lam + XXUU.T @ P @ XXUU)
         delta_W = error[:, np.newaxis] @ g[np.newaxis, :]
         AB += delta_W
         y_hat = y_hat_prior
@@ -134,7 +137,7 @@ class RTDMD():
         #         print("reset P at iteration", count)
         #         P = self.PLimit * np.eye(self.augStateInputDim)
 
-        dmd = {
+        self.rtdmdResult = {
             'P': P,
             'AB': AB,
             'A': AB[:self.augStateDim, :self.augStateDim],
@@ -144,4 +147,4 @@ class RTDMD():
             'error': error,
         }
 
-        return dmd
+        # return self.dmd
