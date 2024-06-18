@@ -91,7 +91,7 @@ ErrorV = rtdmd.calculate_fit_error(test_data_y[:, aug+1:], xPredictV[:, aug+1:])
 print(ErrorV)
 
 
-# 逐次的にデータを追加してRTDMDを更新
+# %% 逐次的にデータを追加してRTDMDを更新
 YV = dmd.concatenate(test_data_y, test_data_u)
 
 rtdmd2 = RTDMD.RTDMD(delta, lam, aug, stateDim, inputDim)
@@ -116,11 +116,11 @@ for i in range(NV):
         continue
 
     # store prevData
-    prevData = newData
+    prevData = newData.copy()
 
     # decompose data to state and input
-    aug_state_data = prevData[:aug*stateDim]
-    aug_input_data = prevData[aug*stateDim:]
+    aug_state_data = prevData[:aug*stateDim].copy()
+    aug_input_data = prevData[aug*stateDim:].copy()
 
     # shift
     aug_state_data[:(aug-1)*stateDim] = aug_state_data[stateDim:]
