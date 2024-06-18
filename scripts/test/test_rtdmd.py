@@ -42,26 +42,26 @@ rtdmd = RTDMD.RTDMD(delta, lam, aug, stateDim, inputDim)
 
 # %%
 dmd = DMD.DMD()
-train_data_delay_y = rtdmd.delay_coordinate_maker(train_data_y)
-train_data_delay_u = rtdmd.delay_coordinate_maker(train_data_u)
+train_data_delay_y = rtdmd.create_delay_coordinates(train_data_y)
+train_data_delay_u = rtdmd.create_delay_coordinates(train_data_u)
 Y = dmd.concatenate(train_data_delay_y, train_data_delay_u)
 dmd.splitdata(XX=Y, stateDim=stateDim, aug=aug)
 A = dmd.DMD()
 
 _, nTime = train_data_y.shape
 
-xPredict = rtdmd.predictstate(A, dmd.X, nTime)
-Error = rtdmd.fit(train_data_y, xPredict)
+xPredict = rtdmd.predict_state(A, dmd.X, nTime)
+Error = rtdmd.calculate_fit_error(train_data_y, xPredict)
 
 # %%
 # 検証データ
-test_data_delay_y = rtdmd.delay_coordinate_maker(test_data_y)
-test_data_delay_u = rtdmd.delay_coordinate_maker(test_data_u)
+test_data_delay_y = rtdmd.create_delay_coordinates(test_data_y)
+test_data_delay_u = rtdmd.create_delay_coordinates(test_data_u)
 YV = dmd.concatenate(test_data_delay_y, test_data_delay_u)
 _, NV = test_data_delay_y.shape
 
-# xPredictVDMD = predictstate(A, YV, NV, aug, stateDim)
-# ErrorVDMD = fit(test_data_y[:, aug:], xPredictVDMD[:, aug:])
+# xPredictVDMD = predict_state(A, YV, NV, aug, stateDim)
+# ErrorVDMD = calculate_fit_error(test_data_y[:, aug:], xPredictVDMD[:, aug:])
 
 # %%
 # 予測値格納用の配列初期化
@@ -77,7 +77,7 @@ dmdlog = [None] * NV
 # メインループ
 for i in range(NV-1):
     newData = YV[:, i+1]
-    rtdmd.RTDMDUpdate(rtdmd.rtdmdResult['AB'], prevData, newData, rtdmd.rtdmdResult['P'], i+1)
+    rtdmd.update_rtdmd(prevData, newData, i+1)
     xPredictV[:, i+1] = rtdmd.rtdmdResult['y_hat']
     
     dmdlog[i] = rtdmd.rtdmdResult
@@ -89,6 +89,6 @@ for i in range(NV-1):
 xPredictV = np.concatenate((np.zeros((stateDim, aug)), xPredictV[:, 1:]), axis=1)
 
 # 誤差計算
-ErrorV = rtdmd.fit(test_data_y[:, aug+1:], xPredictV[:, aug+1:])
+ErrorV = rtdmd.calculate_fit_error(test_data_y[:, aug+1:], xPredictV[:, aug+1:])
 
 print(ErrorV)
