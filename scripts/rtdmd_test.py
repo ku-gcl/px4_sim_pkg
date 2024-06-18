@@ -10,10 +10,15 @@ import px4_sim_pkg.DMD as DMD
 import px4_sim_pkg.RTDMD as RTDMD
 
 
-rospy.init_node("rtdmd_test_node", anonymous=True)
+rospy.init_node("rtdmd_node", anonymous=True)
 
-pred_state_pub = rospy.Publisher('rtdmd/predict_state', Float64MultiArray, queue_size=10)
-data_pub = rospy.Publisher('rtdmd/data', Float64MultiArray, queue_size=10)
+dmd_pred_state_pub = rospy.Publisher('dmd/predict_state', Float64MultiArray, queue_size=10)
+dmd_data_pub = rospy.Publisher('dmd/data', Float64MultiArray, queue_size=10)
+dmd_info_pub = rospy.Publisher('dmd/info', Float64MultiArray, queue_size=10)
+dmd_A_pub = rospy.Publisher('dmd/A', Float64MultiArray, queue_size=10)
+
+rtdmd_pred_state_pub = rospy.Publisher('rtdmd/predict_state', Float64MultiArray, queue_size=10)
+rtdmd_data_pub = rospy.Publisher('rtdmd/data', Float64MultiArray, queue_size=10)
 rtdmd_info_pub = rospy.Publisher('rtdmd/info', Float64MultiArray, queue_size=10)
 rtdmd_A_pub = rospy.Publisher('rtdmd/A', Float64MultiArray, queue_size=10)
 
@@ -104,7 +109,7 @@ while (not rospy.is_shutdown()
     
     data_array = mav.imu + mav.rcout_norm + mav.force_and_torque
     data_msg = Float64MultiArray(data=data_array)
-    data_pub.publish(data_msg)
+    dmd_data_pub.publish(data_msg)
 
     rate_pred.sleep()
 
@@ -147,14 +152,14 @@ _, nTime = y.shape
 # DMD情報のpublish
 finish_dmd_cal = rospy.Time.now()
 calc_time = (finish_dmd_cal - start_dmd_cal).to_sec()
-dmd_info = [calc_time, len(imu_data), len(force_and_torque)]
+dmd_info = [calc_time, len(imu_data), len(force_and_torque), "DMD"]
 dmd_info_msg = Float64MultiArray()
 dmd_info_msg.data = dmd_info
-rtdmd_info_pub.publish(dmd_info_msg)
+dmd_info_pub.publish(dmd_info_msg)
 
 # A行列のpublishとファイル保存
 dmd_A_msg = Float64MultiArray(data=A.flatten())
-rtdmd_A_pub.publish(dmd_A_msg)
+dmd_A_pub.publish(dmd_A_msg)
 
 
 # A行列を現在の日時を含むファイル名で保存
@@ -194,10 +199,11 @@ rcout_data_rtdmd = []
 force_and_torque_rtdmd = []
 
 i = 0
-rospy.loginfo("Sending setpoint and collecting data...")
+rospy.loginfo("Sending setpoint and construct model using RTDMD...")
 while (not rospy.is_shutdown() 
         and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
-    
+
+    loop_start_time = rospy.Time.now()
     time_sec = (rospy.Time.now() - start_time).to_sec()
 
     x, y, z = trajectory.circleXY(time_sec=time_sec, radius=radius, altitude=altitude, w=w)
@@ -211,7 +217,7 @@ while (not rospy.is_shutdown()
     
     data_array = mav.imu + mav.rcout_norm + mav.force_and_torque
     data_msg = Float64MultiArray(data=data_array)
-    data_pub.publish(data_msg)
+    rtdmd_data_pub.publish(data_msg)
 
     x_data = np.array(imu_data_rtdmd).T
     u_temp = np.array(force_and_torque_rtdmd).T
@@ -242,11 +248,31 @@ while (not rospy.is_shutdown()
     newData = np.concatenate([aug_state_data, aug_input_data], axis=0)
 
     ## 更新
+    start_rtdmd_cal = rospy.Time.now()
     rtdmd.update_rtdmd(prevData, newData, i+1)
-    xPredictV.append(rtdmd.rtdmdResult['y_hat'])
+    finish_rtdmd_cal = rospy.Time.now()
+    # RTDMDによる状態予測
+    x_k1 = rtdmd.rtdmdResult['y_hat']
+    xPredictV.append(x_k1)
 
     dmdlog.append(rtdmd.rtdmdResult)
+    
+    # RTDMD情報のpublish
+    loop_finish_time = rospy.Time.now()
+    calc_time = (finish_rtdmd_cal - start_rtdmd_cal).to_sec()
+    loop_time = (loop_finish_time - loop_start_time).to_sec()
+    rtdmd_info = [calc_time, len(imu_data), len(force_and_torque), "RTDMD", loop_time]
+    rtdmd_info_msg = Float64MultiArray()
+    rtdmd_info_msg.data = rtdmd_info
+    rtdmd_info_pub.publish(rtdmd_info_msg)
+    # AB行列のpublish
+    rtdmd_A_msg = Float64MultiArray(data=rtdmd.rtdmdResult.AB.flatten())
+    rtdmd_A_pub.publish(rtdmd_A_msg)
 
+    # 予測された状態x_k1を/rtdmd/predict_stateとしてpublish
+    rtdmd_pred_msg = Float64MultiArray()
+    rtdmd_pred_msg.data = x_k1.flatten()  # flatten()で1次元配列に変換
+    rtdmd_pred_state_pub.publish(rtdmd_pred_msg)
 
     i = i + 1
     rate_pred.sleep()
