@@ -92,8 +92,6 @@ print(ErrorV)
 
 
 # %% 逐次的にデータを追加してRTDMDを更新
-YV = dmd.concatenate(test_data_y, test_data_u)
-
 rtdmd2 = RTDMD.RTDMD(delta, lam, aug, stateDim, inputDim)
 rtdmd2.rtdmdResult["AB"] = A
 prevData = np.zeros(rtdmd2.augStateInputDim)
@@ -129,19 +127,8 @@ for i in range(NV):
     aug_input_data[:(aug-1)*inputDim] = aug_input_data[inputDim:]
     aug_input_data[(aug-1)*inputDim:] = input_data
 
+    # concatenate aug_state_data and aug_input_data
     newData = np.concatenate([aug_state_data, aug_input_data], axis=0)
-
-    # state_shift_row = (aug-1)*stateDim
-    # input_shift_row = (aug-1)*inputDim + state_shift_row
-    
-    # # シフト
-    # newData[:state_shift_row] = prevData[stateDim:state_shift_row + stateDim]
-    # newData[state_shift_row:input_shift_row] = prevData[state_shift_row + inputDim:input_shift_row + inputDim]
-    
-    # # 新しいデータを追加
-    # newData[state_shift_row:state_shift_row+stateDim] = state_data
-    # # newData[input_shift_row:input_shift_row+inputDim] = input_data
-    # newData[state_shift_row+stateDim:state_shift_row+stateDim+input_shift_row+inputDim] = input_data
 
     rtdmd2.update_rtdmd(prevData, newData, i+1)
     xPredictV2.append(rtdmd2.rtdmdResult['y_hat'])
