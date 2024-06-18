@@ -133,7 +133,7 @@ while (not rospy.is_shutdown()
     rate_pred.sleep()
 
 
-# hovering for calculation``
+# hovering for calculation
 rospy.loginfo("Hover for DMD calculation")
 rospy.sleep(2.0)
 x, y, z = trajectory.hover(time_sec, x=0.0, y=0.0, altitude=altitude)
