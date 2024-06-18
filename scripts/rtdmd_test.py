@@ -189,6 +189,10 @@ dmdlog = []
 # 予測値格納用の配列初期化
 xPredictV = []
 
+imu_data_rtdmd = []
+rcout_data_rtdmd = []
+force_and_torque_rtdmd = []
+
 i = 0
 rospy.loginfo("Sending setpoint and collecting data...")
 while (not rospy.is_shutdown() 
@@ -201,16 +205,16 @@ while (not rospy.is_shutdown()
     mav.pub_local_position()
     
     # data collecting
-    imu_data.append(mav.imu)
-    rcout_data.append(mav.rcout_norm)
-    force_and_torque.append(mav.force_and_torque)
+    imu_data_rtdmd.append(mav.imu)
+    rcout_data_rtdmd.append(mav.rcout_norm)
+    force_and_torque_rtdmd.append(mav.force_and_torque)
     
     data_array = mav.imu + mav.rcout_norm + mav.force_and_torque
     data_msg = Float64MultiArray(data=data_array)
     data_pub.publish(data_msg)
 
-    x_data = np.array(imu_data).T
-    u_temp = np.array(force_and_torque).T
+    x_data = np.array(imu_data_rtdmd).T
+    u_temp = np.array(force_and_torque_rtdmd).T
     u_data = u[1:4, :]
 
     if i < aug:
@@ -248,13 +252,17 @@ while (not rospy.is_shutdown()
     rate_pred.sleep()
 
 
-# # xPredictV2リストをNumPy配列に変換
-# xPredictV = np.array(xPredictV).T
-# # 予測前の1~aug列までは0埋めしておく
-# xPredictV = np.concatenate((np.zeros((stateDim, aug)), xPredictV[:, 0:]), axis=1)
-# # 誤差計算
-# ErrorV = rtdmd.calculate_fit_error(test_data_y[:, aug:], xPredictV[:, aug:])
-# print(ErrorV)
+y_rtdmd = np.array(imu_data_rtdmd).T
+u_rtdmd = np.array(force_and_torque_rtdmd).T
+u_rtdmd = u_rtdmd[1:4, :]      # extract torque only
+
+# xPredictV2リストをNumPy配列に変換
+xPredictV = np.array(xPredictV).T
+# 予測前の1~aug列までは0埋めしておく
+xPredictV = np.concatenate((np.zeros((stateDim, aug)), xPredictV[:, 0:]), axis=1)
+# 誤差計算
+ErrorV = rtdmd.calculate_fit_error(y_rtdmd[:, aug:], xPredictV[:, aug:])
+print(ErrorV)
 
 
 
