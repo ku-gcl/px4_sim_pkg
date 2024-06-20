@@ -29,7 +29,8 @@ trajectory = Trajectory.Trajectory()
 altitude = 1.25
 radius = 1.0
 w = 0.63
-duration = 30.0
+# duration = 30.0
+duration = 5.0
 rate_pred = rospy.Rate(25.0)
 
 # -------------------------------------------------------------
@@ -92,91 +93,94 @@ force_and_torque = []
 start_time = rospy.Time.now()
 
 
-rospy.loginfo("Sending setpoint and collecting data...")
-while (not rospy.is_shutdown() 
-        and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
+# rospy.loginfo("Sending setpoint and collecting data...")
+# while (not rospy.is_shutdown() 
+#         and (rospy.Time.now() - start_time) < rospy.Duration(duration)):
     
-    time_sec = (rospy.Time.now() - start_time).to_sec()
+#     time_sec = (rospy.Time.now() - start_time).to_sec()
 
-    x, y, z = trajectory.circleXY(time_sec=time_sec, radius=radius, altitude=altitude, w=w)
-    mav.set_destination(x, y, z)
-    mav.pub_local_position()  
+#     x, y, z = trajectory.circleXY(time_sec=time_sec, radius=radius, altitude=altitude, w=w)
+#     mav.set_destination(x, y, z)
+#     mav.pub_local_position()  
     
-    # data collecting
-    imu_data.append(mav.imu)
-    rcout_data.append(mav.rcout_norm)
-    force_and_torque.append(mav.force_and_torque)
+#     # data collecting
+#     imu_data.append(mav.imu)
+#     rcout_data.append(mav.rcout_norm)
+#     force_and_torque.append(mav.force_and_torque)
     
-    data_array = mav.imu + mav.rcout_norm + mav.force_and_torque
-    data_msg = Float64MultiArray(data=data_array)
-    dmd_data_pub.publish(data_msg)
+#     data_array = mav.imu + mav.rcout_norm + mav.force_and_torque
+#     data_msg = Float64MultiArray(data=data_array)
+#     dmd_data_pub.publish(data_msg)
 
-    rate_pred.sleep()
+#     rate_pred.sleep()
 
 
-# hovering for calculation
-rospy.loginfo("Hover for DMD calculation")
-rospy.sleep(2.0)
-x, y, z = trajectory.hover(time_sec, x=0.0, y=0.0, altitude=altitude)
-mav.set_destination(x, y, z)
-mav.pub_local_position()
-rospy.sleep(2.0)
+# # hovering for calculation
+# rospy.loginfo("Hover for DMD calculation")
+# rospy.sleep(2.0)
+# x, y, z = trajectory.hover(time_sec, x=0.0, y=0.0, altitude=altitude)
+# mav.set_destination(x, y, z)
+# mav.pub_local_position()
+# rospy.sleep(2.0)
 
-# preprocessing and DMD implementation
-rospy.loginfo("DMD calculation start")
-start_dmd_cal = rospy.Time.now()
-# list to nparray
-y = np.array(imu_data).T
-u = np.array(force_and_torque).T
-u = u[1:4, :]      # extract torque only
-stateDim, _ = y.shape
-inputDim, _ = u.shape
+# # preprocessing and DMD implementation
+# rospy.loginfo("DMD calculation start")
+# start_dmd_cal = rospy.Time.now()
+# # list to nparray
+# y = np.array(imu_data).T
+# u = np.array(force_and_torque).T
+# u = u[1:4, :]      # extract torque only
+# stateDim, _ = y.shape
+# inputDim, _ = u.shape
 
 # RTDMD parameter
+# TODO: remove stateDim and inputDim
+stateDim = 6
+inputDim = 3
 delta = 10**(-3)
 lam = 0.97
 aug = 2*stateDim+1
 rtdmd = RTDMD.RTDMD(delta, lam, aug, stateDim, inputDim)
 
-# DMD calculation
-dmd = DMD.DMD()
-train_data_delay_y = rtdmd.create_delay_coordinates(y)
-train_data_delay_u = rtdmd.create_delay_coordinates(u)
-Y = dmd.concatenate(train_data_delay_y, train_data_delay_u)
-dmd.splitdata(XX=Y, stateDim=stateDim, aug=aug)
-A = dmd.DMD()
-_, nTime = y.shape
-# xPredict = rtdmd.predict_state(A, dmd.X, nTime)
-# Error = rtdmd.calculate_fit_error(train_data_y, xPredict)
+# # DMD calculation
+# dmd = DMD.DMD()
+# train_data_delay_y = rtdmd.create_delay_coordinates(y)
+# train_data_delay_u = rtdmd.create_delay_coordinates(u)
+# Y = dmd.concatenate(train_data_delay_y, train_data_delay_u)
+# dmd.splitdata(XX=Y, stateDim=stateDim, aug=aug)
+# A = dmd.DMD()
+# _, nTime = y.shape
+# # xPredict = rtdmd.predict_state(A, dmd.X, nTime)
+# # Error = rtdmd.calculate_fit_error(train_data_y, xPredict)
 
-# DMD情報のpublish
-finish_dmd_cal = rospy.Time.now()
-calc_time = (finish_dmd_cal - start_dmd_cal).to_sec()
-dmd_info = [calc_time, len(imu_data), len(force_and_torque), "DMD"]
-dmd_info_msg = Float64MultiArray()
-dmd_info_msg.data = dmd_info
-dmd_info_pub.publish(dmd_info_msg)
+# # DMD情報のpublish
+# finish_dmd_cal = rospy.Time.now()
+# calc_time = (finish_dmd_cal - start_dmd_cal).to_sec()
+# dmd_info = [calc_time, len(imu_data), len(force_and_torque), "DMD"]
+# dmd_info_msg = Float64MultiArray()
+# dmd_info_msg.data = dmd_info
+# dmd_info_pub.publish(dmd_info_msg)
 
-# A行列のpublishとファイル保存
-dmd_A_msg = Float64MultiArray(data=A.flatten())
-dmd_A_pub.publish(dmd_A_msg)
+# # A行列のpublishとファイル保存
+# dmd_A_msg = Float64MultiArray(data=A.flatten())
+# dmd_A_pub.publish(dmd_A_msg)
 
 
-# A行列を現在の日時を含むファイル名で保存
-home_directory = os.path.expanduser('~')
-current_date_str = datetime.now().strftime("%Y-%m-%d")
-data_directory = os.path.join(home_directory, 'rosbag', current_date_str)
-# dataディレクトリが存在しない場合は作成
-if not os.path.exists(data_directory):
-    os.makedirs(data_directory)
-current_time_str = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-filename = os.path.join(data_directory, f"A_matrix_{current_time_str}.csv")
-np.savetxt(filename, A, delimiter=',')
-rospy.loginfo(f"A matrix saved to {filename}")
+# # A行列を現在の日時を含むファイル名で保存
+# home_directory = os.path.expanduser('~')
+# current_date_str = datetime.now().strftime("%Y-%m-%d")
+# data_directory = os.path.join(home_directory, 'rosbag', current_date_str)
+# # dataディレクトリが存在しない場合は作成
+# if not os.path.exists(data_directory):
+#     os.makedirs(data_directory)
+# current_time_str = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+# filename = os.path.join(data_directory, f"A_matrix_{current_time_str}.csv")
+# np.savetxt(filename, A, delimiter=',')
+# rospy.loginfo(f"A matrix saved to {filename}")
 
-rospy.loginfo(A)
+# rospy.loginfo(A)
 
-rospy.sleep(5)
+# rospy.sleep(5)
 
 
 ##########################
@@ -185,7 +189,7 @@ start_time = rospy.Time.now()
 
 
 # RTDMD 初期化
-rtdmd.rtdmdResult["AB"] = A
+# rtdmd.rtdmdResult["AB"] = A
 prevData = np.zeros(rtdmd.augStateInputDim)
 newData = np.zeros(rtdmd.augStateInputDim)
 
@@ -211,17 +215,21 @@ while (not rospy.is_shutdown()
     mav.pub_local_position()
     
     # data collecting
-    imu_data_rtdmd.append(mav.imu)
-    rcout_data_rtdmd.append(mav.rcout_norm)
-    force_and_torque_rtdmd.append(mav.force_and_torque)
+    imu_ = mav.imu.copy()
+    rcout_ = mav.rcout_norm.copy()
+    fandt_ = mav.force_and_torque.copy()
+    
+    imu_data_rtdmd.append(imu_)
+    rcout_data_rtdmd.append(rcout_)
+    force_and_torque_rtdmd.append(fandt_)
     
     data_array = mav.imu + mav.rcout_norm + mav.force_and_torque
     data_msg = Float64MultiArray(data=data_array)
     rtdmd_data_pub.publish(data_msg)
 
-    x_data = np.array(imu_data_rtdmd).T
-    u_temp = np.array(force_and_torque_rtdmd).T
-    u_data = u[1:4, :]
+    x_data = np.array(imu_).T
+    u_temp = np.array(fandt_).T
+    u_data = u_temp[1:4]
 
     if i < aug:
         newData[i*stateDim:(i+1)*stateDim] = x_data
@@ -254,6 +262,7 @@ while (not rospy.is_shutdown()
     # RTDMDによる状態予測
     x_k1 = rtdmd.rtdmdResult['y_hat']
     xPredictV.append(x_k1)
+    rospy.loginfo(f"xPredictV: {xPredictV}")
 
     dmdlog.append(rtdmd.rtdmdResult)
     
@@ -265,6 +274,7 @@ while (not rospy.is_shutdown()
     rtdmd_info_msg = Float64MultiArray()
     rtdmd_info_msg.data = rtdmd_info
     rtdmd_info_pub.publish(rtdmd_info_msg)
+    rospy.loginfo(f"rtdmd info: {rtdmd_info}")
     # AB行列のpublish
     rtdmd_A_msg = Float64MultiArray(data=rtdmd.rtdmdResult.AB.flatten())
     rtdmd_A_pub.publish(rtdmd_A_msg)
@@ -283,9 +293,13 @@ u_rtdmd = np.array(force_and_torque_rtdmd).T
 u_rtdmd = u_rtdmd[1:4, :]      # extract torque only
 
 # xPredictV2リストをNumPy配列に変換
+print(xPredictV)
+len(xPredictV)
 xPredictV = np.array(xPredictV).T
+print(xPredictV.shape)
 # 予測前の1~aug列までは0埋めしておく
 xPredictV = np.concatenate((np.zeros((stateDim, aug)), xPredictV[:, 0:]), axis=1)
+print(xPredictV.shape)
 # 誤差計算
 ErrorV = rtdmd.calculate_fit_error(y_rtdmd[:, aug:], xPredictV[:, aug:])
 print(ErrorV)
