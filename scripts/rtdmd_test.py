@@ -156,7 +156,7 @@ rtdmd = RTDMD.RTDMD(delta, lam, aug, stateDim, inputDim)
 # # DMD情報のpublish
 # finish_dmd_cal = rospy.Time.now()
 # calc_time = (finish_dmd_cal - start_dmd_cal).to_sec()
-# dmd_info = [calc_time, len(imu_data), len(force_and_torque), "DMD"]
+# dmd_info = [calc_time, len(imu_data), len(force_and_torque)]
 # dmd_info_msg = Float64MultiArray()
 # dmd_info_msg.data = dmd_info
 # dmd_info_pub.publish(dmd_info_msg)
@@ -235,6 +235,8 @@ while (not rospy.is_shutdown()
         newData[i*stateDim:(i+1)*stateDim] = x_data
         u_start = stateDim * aug
         newData[u_start+i*inputDim:u_start+(i+1)*inputDim] = u_data
+        i = i + 1
+        rate_pred.sleep()
         continue
 
     # store prevData
@@ -270,13 +272,13 @@ while (not rospy.is_shutdown()
     loop_finish_time = rospy.Time.now()
     calc_time = (finish_rtdmd_cal - start_rtdmd_cal).to_sec()
     loop_time = (loop_finish_time - loop_start_time).to_sec()
-    rtdmd_info = [calc_time, len(imu_data), len(force_and_torque), "RTDMD", loop_time]
+    rtdmd_info = [calc_time, len(imu_data), len(force_and_torque), loop_time]
     rtdmd_info_msg = Float64MultiArray()
     rtdmd_info_msg.data = rtdmd_info
     rtdmd_info_pub.publish(rtdmd_info_msg)
     rospy.loginfo(f"rtdmd info: {rtdmd_info}")
     # AB行列のpublish
-    rtdmd_A_msg = Float64MultiArray(data=rtdmd.rtdmdResult.AB.flatten())
+    rtdmd_A_msg = Float64MultiArray(data=rtdmd.rtdmdResult['AB'].flatten())
     rtdmd_A_pub.publish(rtdmd_A_msg)
 
     # 予測された状態x_k1を/rtdmd/predict_stateとしてpublish
