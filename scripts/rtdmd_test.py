@@ -264,7 +264,7 @@ while (not rospy.is_shutdown()
     # RTDMDによる状態予測
     x_k1 = rtdmd.rtdmdResult['y_hat']
     xPredictV.append(x_k1)
-    rospy.loginfo(f"xPredictV: {xPredictV}")
+    # rospy.loginfo(f"xPredictV: {xPredictV}")
 
     dmdlog.append(rtdmd.rtdmdResult)
     
@@ -276,7 +276,7 @@ while (not rospy.is_shutdown()
     rtdmd_info_msg = Float64MultiArray()
     rtdmd_info_msg.data = rtdmd_info
     rtdmd_info_pub.publish(rtdmd_info_msg)
-    rospy.loginfo(f"rtdmd info: {rtdmd_info}")
+    # rospy.loginfo(f"rtdmd info: {rtdmd_info}")
     # AB行列のpublish
     rtdmd_A_msg = Float64MultiArray(data=rtdmd.rtdmdResult['AB'].flatten())
     rtdmd_A_pub.publish(rtdmd_A_msg)
@@ -294,17 +294,14 @@ y_rtdmd = np.array(imu_data_rtdmd).T
 u_rtdmd = np.array(force_and_torque_rtdmd).T
 u_rtdmd = u_rtdmd[1:4, :]      # extract torque only
 
-# xPredictV2リストをNumPy配列に変換
-print(xPredictV)
-len(xPredictV)
+# xPredictVリストをNumPy配列に変換
 xPredictV = np.array(xPredictV).T
-print(xPredictV.shape)
 # 予測前の1~aug列までは0埋めしておく
 xPredictV = np.concatenate((np.zeros((stateDim, aug)), xPredictV[:, 0:]), axis=1)
-print(xPredictV.shape)
+rospy.loginfo(f"xPredictV's shape: {xPredictV.shape}")
 # 誤差計算
 ErrorV = rtdmd.calculate_fit_error(y_rtdmd[:, aug:], xPredictV[:, aug:])
-print(ErrorV)
+rospy.loginfo(f"Fit Rate: {ErrorV}")
 
 
 
