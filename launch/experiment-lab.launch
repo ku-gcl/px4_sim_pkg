@@ -4,7 +4,7 @@
 	<!-- for Experiment -->
     <!-- roslaunch apm.launch fcu_url:=/dev/ttyS0:921600 gcs_url:=udp://:14550@192.168.0.173:14557 -->
 	<arg name="fcu_url" default="/dev/ttyS0:921600" />
-	<arg name="gcs_url" default="udp://:14550@192.168.1.198:14557" />
+	<arg name="gcs_url" default="udp://:14550@192.168.1.196:14557" />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
 	<arg name="log_output" default="screen" />
